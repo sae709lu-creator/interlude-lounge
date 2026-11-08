@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>中繼休息大廳｜The Interlude Lounge</title>
+<meta name="description" content="RP 角色與世界觀作品的互動展示入口。">
+<style>
+/* =========================================================
+   設計代幣
+   ========================================================= */
+:root{
+  --night:#161E2B; --wall:#293747; --floor:#504C4B;
+  --gold:#D9AD70; --gold-hi:#F0CF98; --gold-lo:#A77F4C;
+  --mist:#71998A; --mist-hi:#8FB6A6; --violet:#9B89D1; --violet-hi:#C5B8F0;
+  --cream:#E9DDC5; --muted:#B3A893; --ink:#0E131B;
+  --panel-2:#232D3E;
+  --page:#1C2433; --page-edge:#141B27;
+  --f-body:"PingFang TC","Noto Sans TC","Noto Sans CJK TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;
+  --f-title:"Songti TC","Noto Serif TC","Noto Serif CJK TC","Source Han Serif TC","PMingLiU","MingLiU",serif;
+  --f-mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  color-scheme:dark;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --page:#0F141D; --page-edge:#0A0E15; }
+}
+:root[data-theme="dark"]{ --page:#0F141D; --page-edge:#0A0E15; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+body{
+  margin:0; min-height:100%;
+  background:var(--page);
+  background-image:radial-gradient(ellipse at 50% 40%, transparent 40%, var(--page-edge) 100%);
+  color:var(--cream); font-family:var(--f-body); font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+body.modal-open{ overflow:hidden; }
+.sr-only{ position:absolute!important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+button{ font:inherit; color:inherit; }
+
+/* =========================================================
+   頁首
+   ========================================================= */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  max-width:1320px; margin:0 auto; padding:14px clamp(16px,3vw,32px) 12px;
+}
+.brand{ display:flex; align-items:center; gap:12px; min-width:0; }
+.brand svg{ width:32px; height:40px; flex:none; }
+.brand h1{
+  margin:0; font-family:var(--f-title); font-weight:700;
+  font-size:clamp(1.25rem,2.2vw,1.625rem); line-height:1.2; letter-spacing:.12em; color:var(--cream);
+}
+.brand p{ margin:2px 0 0; font-size:.8125rem; color:var(--gold); letter-spacing:.04em; }
+
+/* =========================================================
+   像素按鈕
+   ========================================================= */
+.btn{
+  --bd:var(--gold-lo);
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  min-height:44px; padding:8px 18px;
+  background:var(--panel-2); color:var(--cream); border:0; cursor:pointer;
+  font-size:.9375rem; line-height:1.3; text-decoration:none; white-space:nowrap;
+  clip-path:polygon(0 4px,4px 4px,4px 0,calc(100% - 4px) 0,calc(100% - 4px) 4px,100% 4px,100% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,4px calc(100% - 4px),0 calc(100% - 4px));
+  box-shadow:inset 0 0 0 2px var(--bd), inset 0 -6px 0 rgba(0,0,0,.28);
+}
+.btn:hover{ background:#2D394D; }
+.btn:active{ box-shadow:inset 0 0 0 2px var(--bd), inset 0 4px 0 rgba(0,0,0,.28); }
+.btn:focus-visible{ outline:none; box-shadow:inset 0 0 0 3px var(--violet-hi), inset 0 -6px 0 rgba(0,0,0,.28); }
+.btn-primary{ background:var(--gold); color:#21170F; --bd:#F6DDB2; font-weight:700; }
+.btn-primary:hover{ background:var(--gold-hi); }
+.btn-primary[disabled]{ opacity:.6; cursor:progress; }
+.btn-pending{ background:transparent; color:var(--muted); --bd:#4A5263; cursor:not-allowed; }
+.btn-pending:hover{ background:transparent; }
+.btn-ghost{ background:transparent; --bd:transparent; padding-left:10px; padding-right:12px; color:var(--gold-hi); }
+.btn-ghost:hover{ background:rgba(255,255,255,.06); }
+.btn-quick .btn-icon{ width:16px; height:16px; }
+
+/* =========================================================
+   大廳場景
+   ========================================================= */
+main{ padding:0 clamp(8px,2vw,24px) 20px; }
+.stage-scroll{
+  max-width:1320px; margin:0 auto; overflow-x:auto; overflow-y:hidden;
+  scrollbar-width:thin; scrollbar-color:#3A4558 transparent; overscroll-behavior-x:contain;
+  padding:6px;
+}
+.stage{
+  position:relative; margin:0 auto;
+  width:min(100%, 1280px, calc((100svh - 150px) * 1.6));
+  min-width:min(100%, 560px);
+  aspect-ratio:960 / 600;
+  background:var(--ink);
+  box-shadow:0 0 0 4px var(--ink), 0 0 0 6px #3A4558, 0 0 0 10px var(--ink), 0 18px 40px rgba(0,0,0,.45);
+}
+.stage > svg{ display:block; width:100%; height:100%; }
+.hint{
+  max-width:1320px; margin:18px auto 0; text-align:center;
+  font-size:.875rem; color:var(--muted); padding:0 16px;
+}
+.hint kbd{
+  font-family:var(--f-body); font-size:.8125rem; padding:0 6px;
+  background:var(--panel-2); color:var(--cream); box-shadow:inset 0 -2px 0 rgba(0,0,0,.4);
+}
+
+@media (max-width: 760px){
+  .stage{ width:820px; min-width:820px; }
+  .stage-scroll{ padding:6px 12px 10px; }
+  .hint .desk-only{ display:none; }
+}
+@media (min-width: 761px){ .hint .touch-only{ display:none; } }
+
+/* 互動物件 */
+.hot{ cursor:pointer; outline:none; --hl:var(--gold-hi); }
+.hot .hit{ pointer-events:all; }
+.hot:hover .art{
+  filter:drop-shadow(2px 0 0 var(--hl)) drop-shadow(-2px 0 0 var(--hl)) drop-shadow(0 2px 0 var(--hl)) drop-shadow(0 -2px 0 var(--hl));
+}
+.hot:focus-visible .art{
+  --hl:var(--violet-hi);
+  filter:drop-shadow(3px 0 0 var(--hl)) drop-shadow(-3px 0 0 var(--hl)) drop-shadow(0 3px 0 var(--hl)) drop-shadow(0 -3px 0 var(--hl)) brightness(1.1);
+}
+.hot.tap .art{ animation:tap .36s steps(2) 1; }
+@keyframes tap{ 0%{ filter:brightness(1.7); } 100%{ filter:brightness(1); } }
+.lights{ pointer-events:none; }
+.cat{ pointer-events:none; }
+
+/* 名稱提示 */
+.tip{
+  position:absolute; left:0; top:0; z-index:2; pointer-events:none;
+  transform:translate(-50%, calc(-100% - 6px));
+  display:flex; align-items:baseline; gap:8px;
+  padding:6px 12px; background:var(--ink); color:var(--cream);
+  font-size:.875rem; line-height:1.3; white-space:nowrap;
+  box-shadow:0 0 0 2px var(--gold), 4px 4px 0 2px rgba(0,0,0,.4);
+  opacity:0; transition:opacity .12s;
+}
+.tip.inside{ transform:translate(-50%, 8px); }
+.tip.show{ opacity:1; }
+.tip strong{ color:var(--gold-hi); font-weight:700; }
+.tip span{ color:var(--muted); font-size:.8125rem; }
+
+/* 場景微動態 */
+.screen{ animation:flicker 7s steps(1) infinite; }
+@keyframes flicker{ 0%,90%,100%{opacity:1} 91%{opacity:.72} 93%{opacity:1} 95%{opacity:.85} }
+.cursor{ animation:blink 1.1s steps(1) infinite; }
+@keyframes blink{ 0%,50%{opacity:1} 51%,100%{opacity:0} }
+.lamp-glow{ animation:lamp 5s ease-in-out infinite alternate; }
+@keyframes lamp{ from{opacity:.82} to{opacity:1} }
+.seam-glow{ animation:seam 3.6s ease-in-out infinite alternate; }
+@keyframes seam{ from{opacity:.65} to{opacity:1} }
+.ind-on{ animation:ind 2.4s steps(1) infinite; }
+@keyframes ind{ 0%,60%{opacity:1} 61%,100%{opacity:.45} }
+.odd-btn, .led2{ animation:ind 3.2s steps(1) infinite; }
+.steam{ animation:steam 2.6s steps(3) infinite; }
+.steam.s2{ animation-delay:-1.3s; }
+@keyframes steam{ 0%{transform:translateY(0);opacity:0} 40%{opacity:.35} 100%{transform:translateY(-6px);opacity:0} }
+.cat-tail{ transform-box:fill-box; transform-origin:0% 100%; animation:tail 6s steps(1) infinite; }
+@keyframes tail{ 0%,78%,100%{transform:rotate(0)} 80%{transform:rotate(-10deg)} 84%{transform:rotate(4deg)} 88%{transform:rotate(-7deg)} 92%{transform:rotate(0)} }
+
+/* =========================================================
+   視窗面板
+   ========================================================= */
+.overlay{
+  position:fixed; inset:0; z-index:50;
+  display:flex; align-items:center; justify-content:center;
+  padding:max(24px, env(safe-area-inset-top,0px)) 24px max(24px, env(safe-area-inset-bottom,0px));
+  background:rgba(8,11,17,.72);
+}
+.overlay[hidden]{ display:none; }
+.modal{
+  --frame:#7A5236; --frame-hi:#D9AD70; --accent:#D9AD70; --bg:#1A2230; --row:#232D3E;
+  position:relative; display:flex; flex-direction:column;
+  width:min(940px, 100%); max-height:min(780px, 100%);
+  padding:8px; background:var(--bg); color:var(--cream);
+  clip-path:polygon(0 8px,4px 8px,4px 4px,8px 4px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 4px,calc(100% - 4px) 4px,calc(100% - 4px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 4px) calc(100% - 8px),calc(100% - 4px) calc(100% - 4px),calc(100% - 8px) calc(100% - 4px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 4px),4px calc(100% - 4px),4px calc(100% - 8px),0 calc(100% - 8px));
+  box-shadow:inset 0 0 0 4px var(--frame), inset 0 0 0 6px var(--frame-hi), inset 0 0 0 8px var(--ink);
+  animation:modal-in .16s steps(3) 1;
+}
+@keyframes modal-in{ from{ transform:scale(.97); opacity:.4; } to{ transform:none; opacity:1; } }
+.modal[data-skin="wood"]  { --frame:#573A27; --frame-hi:#B5845A; --bg:#1E1915; --row:#2A221C; }
+.modal[data-skin="paper"] { --frame:#6B4630; --frame-hi:#C09668; --bg:#231C17; --row:#2E251E; }
+.modal[data-skin="lounge"]{ --frame:#476A5D; --frame-hi:#8FB6A6; --accent:#8FB6A6; --bg:#17221F; --row:#1F2D29; }
+.modal[data-skin="screen"]{ --frame:#3D4250; --frame-hi:#71998A; --accent:#8FB6A6; --bg:#0C1A18; --row:#12241F; }
+.modal[data-skin="lift"]  { --frame:#4A5568; --frame-hi:#9B89D1; --accent:#C5B8F0; --bg:#181A28; --row:#212436; }
+.modal[data-skin="gacha"] { --frame:#82362F; --frame-hi:#D8746A; --accent:#F0A79C; --bg:#211718; --row:#2C1F20; }
+.modal[data-skin="screen"] .modal-body{
+  background-image:repeating-linear-gradient(0deg, rgba(113,153,138,.05) 0 2px, transparent 2px 4px);
+}
+
+.modal-head{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:18px 14px 14px 22px;
+  border-bottom:2px solid rgba(0,0,0,.35);
+  box-shadow:0 2px 0 rgba(255,255,255,.04);
+}
+.modal-head-text{ min-width:0; padding-top:4px; }
+.modal-head h2{
+  margin:0; font-family:var(--f-title); font-weight:700;
+  font-size:clamp(1.25rem, 2.4vw, 1.5rem); line-height:1.3; letter-spacing:.06em;
+}
+.modal-head h2:focus{ outline:none; }
+.modal-head p{ margin:2px 0 0; font-size:.875rem; color:var(--accent); }
+.modal-close{
+  margin-left:auto; flex:none; width:44px; height:44px; padding:0;
+  display:grid; place-items:center;
+}
+.modal-close svg{ width:14px; height:14px; }
+.modal-body{
+  flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  padding:20px 22px 28px;
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.18) transparent;
+}
+.modal-body h3{ font-family:var(--f-title); letter-spacing:.04em; }
+.modal-body [data-focus]:focus{ outline:none; }
+
+@media (max-width: 640px){
+  .overlay{ padding:0; }
+  .modal{
+    width:100%; height:100%; max-height:none;
+    clip-path:none; animation:none;
+    padding-top:calc(8px + env(safe-area-inset-top,0px));
+    padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));
+  }
+  .modal-head{ padding:12px 8px 12px 16px; position:sticky; top:0; }
+  .modal-body{ padding:16px 16px 28px; }
+}
+
+/* ---------- 共用元件 ---------- */
+.lead{ font-size:1.0625rem; max-width:38em; margin:0 0 20px; }
+.section-title{ font-size:1.0625rem; margin:24px 0 10px; color:var(--accent); }
+.status{ margin:12px 0 10px; font-size:.875rem; color:var(--muted); min-height:1.4em; }
+.empty{
+  grid-column:1 / -1;
+  padding:32px 20px; text-align:center; color:var(--muted);
+  border:2px dashed rgba(233,221,197,.18);
+}
+.empty p{ margin:0 0 14px; }
+.empty p:last-child{ margin-bottom:0; }
+.demo-badge{
+  display:inline-block; font-size:.75rem; line-height:1.4; padding:1px 8px;
+  background:rgba(217,173,112,.16); color:var(--gold-hi); box-shadow:inset 0 0 0 1px rgba(217,173,112,.45);
+}
+.actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+
+.cover{ position:relative; aspect-ratio:3 / 4; background:#0F141C; overflow:hidden; }
+.cover img, .cover svg, .cover video{ display:block; width:100%; height:100%; object-fit:cover; }
+.cover .badges{ position:absolute; left:6px; top:6px; display:flex; gap:4px; }
+.cover .badges .demo-badge{ background:rgba(14,19,27,.85); }
+.cover .badges .badge-18{ background:rgba(110,38,33,.92); color:#FFE3DD; box-shadow:inset 0 0 0 1px rgba(216,116,106,.6); font-weight:700; }
+
+/* ---------- 設施列表 ---------- */
+.fac-list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(min(260px,100%), 1fr)); }
+.fac-btn{
+  width:100%; display:grid; grid-template-columns:40px 1fr; gap:14px; align-items:center;
+  min-height:60px; padding:10px 14px; text-align:left; cursor:pointer;
+  background:var(--row); border:0; box-shadow:inset 4px 0 0 var(--c, var(--gold));
+}
+.fac-btn:hover{ background:rgba(255,255,255,.07); }
+.fac-btn:focus-visible{ outline:3px solid var(--violet-hi); outline-offset:-3px; }
+.fac-btn svg{ width:40px; height:40px; }
+.fac-btn strong{ display:block; font-size:1rem; line-height:1.35; }
+.fac-btn span{ display:block; font-size:.8125rem; color:var(--muted); line-height:1.4; }
+.howto{ margin:0; padding-left:1.2em; max-width:40em; }
+.howto li{ margin:4px 0; }
+.howto li::marker{ color:var(--gold); }
+
+/* ---------- 角色圖庫 ---------- */
+.toolbar{ display:flex; flex-direction:column; gap:12px; }
+.search{
+  width:100%; min-height:44px; padding:10px 14px;
+  font:inherit; color:var(--cream); background:#120F0C; border:0;
+  box-shadow:inset 0 0 0 2px #4A3A2C, inset 0 3px 0 rgba(0,0,0,.4);
+}
+.search::placeholder{ color:#8C826F; }
+.search:focus{ outline:none; box-shadow:inset 0 0 0 2px var(--gold), inset 0 3px 0 rgba(0,0,0,.4); }
+.chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  min-height:40px; padding:6px 14px; cursor:pointer; font-size:.875rem;
+  background:var(--row); border:0; box-shadow:inset 0 0 0 2px rgba(181,132,90,.45);
+}
+.chip:hover{ background:rgba(255,255,255,.07); }
+.chip[aria-pressed="true"]{ background:var(--gold); color:#21170F; box-shadow:inset 0 -3px 0 var(--gold-lo); font-weight:700; }
+.chip:focus-visible{ outline:3px solid var(--violet-hi); outline-offset:1px; }
+.grid{
+  display:grid; gap:18px 16px;
+  grid-template-columns:repeat(auto-fill, minmax(min(150px, calc(50% - 8px)), 1fr));
+}
+.card{
+  display:flex; flex-direction:column; gap:4px; padding:0; text-align:left; cursor:pointer;
+  background:none; border:0;
+}
+.card .cover{ box-shadow:0 0 0 2px var(--ink), 0 0 0 4px #4A3A2C; margin-bottom:6px; }
+.card:hover .cover{ box-shadow:0 0 0 2px var(--ink), 0 0 0 4px var(--gold); }
+.card:focus-visible{ outline:none; }
+.card:focus-visible .cover{ box-shadow:0 0 0 2px var(--ink), 0 0 0 5px var(--violet-hi); }
+.card-title{ font-weight:700; font-size:.9375rem; line-height:1.4; }
+.card-meta{ font-size:.75rem; color:var(--muted); line-height:1.4; }
+
+/* ---------- 作品詳細 ---------- */
+.back{ margin:-6px 0 14px -6px; }
+.detail{ display:grid; grid-template-columns:minmax(0, 260px) 1fr; gap:28px; align-items:start; }
+.detail .cover{ box-shadow:0 0 0 2px var(--ink), 0 0 0 4px var(--frame-hi); }
+.detail h3{ margin:0 0 8px; font-size:1.625rem; line-height:1.3; }
+.detail .desc{ margin:14px 0 0; max-width:34em; }
+.meta-dl{ display:grid; grid-template-columns:auto 1fr; gap:8px 18px; margin:20px 0 0; font-size:.9375rem; }
+.meta-dl dt{ color:var(--muted); }
+.meta-dl dd{ margin:0; }
+.taglist{ display:flex; flex-wrap:wrap; gap:6px; list-style:none; margin:0; padding:0; }
+.tag{ font-size:.8125rem; padding:1px 8px; background:rgba(255,255,255,.07); }
+.tag-btn{ border:0; cursor:pointer; min-height:32px; padding:4px 10px; color:var(--cream); }
+.tag-btn:hover{ background:rgba(217,173,112,.22); }
+.tag-btn:focus-visible{ outline:2px solid var(--violet-hi); outline-offset:1px; }
+.desc, .feature p, .gacha-card p, .term-detail .summary{ white-space:pre-line; }
+.term-detail .summary.muted{ color:var(--muted); }
+.feature-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+.feature-head .intro{ margin:0; }
+@media (max-width: 640px){
+  .detail{ grid-template-columns:1fr; gap:18px; }
+  .detail .cover{ max-width:240px; }
+}
+
+/* ---------- 公告欄 ---------- */
+.notes{ list-style:none; margin:0; padding:8px 4px 0; display:grid; gap:22px; grid-template-columns:repeat(auto-fill, minmax(min(260px,100%),1fr)); }
+.note{
+  position:relative; padding:18px 18px 16px;
+  background:#E9DDC5; color:#2B2119; box-shadow:5px 5px 0 rgba(0,0,0,.35);
+}
+.note:nth-child(3n+2){ background:#DCE8DF; }
+.note:nth-child(3n+3){ background:#E4DDF2; }
+.note::before{
+  content:""; position:absolute; top:-5px; left:calc(50% - 5px); width:10px; height:10px;
+  background:#B5504A; box-shadow:0 0 0 2px #2B2119, 2px 2px 0 2px rgba(0,0,0,.25);
+}
+.note time{ font-size:.8125rem; font-weight:700; color:#7A5236; }
+.note h3{ margin:4px 0 6px; font-size:1.125rem; line-height:1.35; color:#21170F; }
+.note p{ margin:0; font-size:.9375rem; }
+.note-link{
+  display:inline-flex; align-items:center; min-height:44px; margin-top:8px; padding:0;
+  background:none; border:0; cursor:pointer; color:#6B3F50; font-weight:700; text-decoration:underline; text-underline-offset:3px;
+}
+.note-link:focus-visible{ outline:3px solid #6D5EA3; outline-offset:2px; }
+
+/* ---------- 精選推薦 ---------- */
+.intro{ margin:0 0 18px; color:var(--muted); }
+.features{ display:grid; gap:16px; grid-template-columns:repeat(auto-fill, minmax(min(380px,100%),1fr)); }
+.feature{
+  display:grid; grid-template-columns:104px 1fr; gap:16px; padding:14px;
+  background:var(--row); box-shadow:inset 0 0 0 2px rgba(143,182,166,.22);
+}
+.feature .cover{ box-shadow:0 0 0 2px var(--ink); }
+.feature h3{ margin:0 0 6px; font-size:1.125rem; line-height:1.35; }
+.feature p{ margin:0; font-size:.9375rem; }
+.feature .actions{ margin-top:12px; }
+
+/* ---------- 終端機 ---------- */
+.term-path{ margin:0 0 14px; font-family:var(--f-mono); font-size:.8125rem; color:var(--mist); }
+.term-path::before{ content:"> "; color:var(--violet-hi); }
+.term{ display:grid; grid-template-columns:250px 1fr; gap:20px; align-items:start; }
+.term-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.term-item{
+  width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px;
+  min-height:48px; padding:10px 14px; text-align:left; cursor:pointer;
+  background:transparent; border:0;
+}
+.term-item:hover{ background:rgba(113,153,138,.1); }
+.term-item[aria-current="true"]{ background:rgba(113,153,138,.2); box-shadow:inset 4px 0 0 var(--mist); }
+.term-item:focus-visible{ outline:3px solid var(--violet-hi); outline-offset:-3px; }
+.term-name{ font-weight:700; }
+.term-count{ font-size:.8125rem; color:var(--mist-hi); white-space:nowrap; }
+.term-detail{ padding:18px 20px; background:rgba(0,0,0,.25); box-shadow:inset 0 0 0 2px #23403A; min-width:0; }
+.term-detail h3{ margin:0; font-size:1.375rem; }
+.term-detail .tagline{ margin:4px 0 12px; color:var(--mist-hi); }
+.term-detail .summary{ margin:0; max-width:36em; }
+.term-stat{ margin:14px 0 0; font-family:var(--f-mono); font-size:.8125rem; color:var(--mist); }
+@media (max-width: 640px){ .term{ grid-template-columns:1fr; } }
+
+.work-list{ list-style:none; margin:12px 0 0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.work-row{
+  width:100%; display:grid; grid-template-columns:48px 1fr auto; gap:14px; align-items:center;
+  min-height:44px; padding:8px 12px 8px 8px; text-align:left; cursor:pointer;
+  background:rgba(255,255,255,.035); border:0;
+}
+.work-row:hover{ background:rgba(255,255,255,.08); }
+.work-row:focus-visible{ outline:3px solid var(--violet-hi); outline-offset:-3px; }
+.work-row .cover{ width:48px; }
+.work-row .cover .badges{ display:none; }
+.work-row strong{ display:block; font-size:.9375rem; line-height:1.4; }
+.work-row small{ display:block; font-size:.75rem; color:var(--muted); line-height:1.4; }
+.work-row .go{ font-size:.8125rem; color:var(--accent); }
+
+/* ---------- 電梯 ---------- */
+.lift-display{
+  display:flex; align-items:center; gap:16px; margin-bottom:16px; padding:12px 18px;
+  background:#0B0C14; box-shadow:inset 0 0 0 2px #2D2A48;
+}
+.lift-floor{
+  min-width:2.6em; font-family:var(--f-mono); font-size:1.75rem; font-weight:700; line-height:1;
+  color:var(--violet-hi); text-shadow:0 0 8px rgba(155,137,209,.65);
+}
+.lift-name{ font-size:1.0625rem; }
+.lift-buttons{ display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(min(190px,100%),1fr)); }
+.lift-btn{
+  display:flex; align-items:center; gap:12px; min-height:52px; padding:8px 14px 8px 8px; cursor:pointer; text-align:left;
+  background:var(--row); border:0; box-shadow:inset 0 0 0 2px #3B3F55;
+}
+.lift-btn:hover{ background:#2A2D42; }
+.lift-btn:focus-visible{ outline:3px solid var(--violet-hi); outline-offset:-3px; }
+.lift-btn .num{
+  display:grid; place-items:center; flex:none; width:38px; height:38px;
+  background:#3B3F55; font-size:.8125rem; font-weight:700;
+  clip-path:polygon(0 8px,4px 8px,4px 4px,8px 4px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 4px,calc(100% - 4px) 4px,calc(100% - 4px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 4px) calc(100% - 8px),calc(100% - 4px) calc(100% - 4px),calc(100% - 8px) calc(100% - 4px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 4px),4px calc(100% - 4px),4px calc(100% - 8px),0 calc(100% - 8px));
+}
+.lift-btn[aria-pressed="true"] .num{ background:var(--violet); color:#141225; }
+.lift-btn[aria-pressed="true"]{ box-shadow:inset 0 0 0 2px var(--violet); }
+.lift-btn .cnt{ margin-left:auto; font-size:.8125rem; color:var(--muted); }
+.lift-results{ margin-top:22px; }
+
+/* ---------- 扭蛋機 ---------- */
+.gacha{ display:grid; grid-template-columns:210px 1fr; gap:28px; align-items:start; }
+.gacha-machine{ display:flex; flex-direction:column; align-items:center; gap:16px; }
+.capsule-stage{
+  width:180px; height:180px; display:grid; place-items:center;
+  background:#140F10; box-shadow:inset 0 0 0 2px #4A2622, inset 0 -24px 0 rgba(255,255,255,.03);
+}
+.capsule svg{ display:block; width:104px; height:104px; overflow:visible; }
+.capsule .cap-top{ transform-box:fill-box; transform-origin:0% 100%; transition:transform .24s steps(3); }
+.capsule.open .cap-top{ transform:translate(-2px,-4px) rotate(-16deg); }
+.capsule.rolling{ animation:roll .5s steps(4) 1; }
+@keyframes roll{
+  0%{ transform:translateY(-28px) rotate(0deg); }
+  25%{ transform:translateY(0) rotate(90deg); }
+  50%{ transform:translateY(-10px) rotate(180deg); }
+  75%{ transform:translateY(0) rotate(270deg); }
+  100%{ transform:translateY(0) rotate(360deg); }
+}
+.gacha-machine .btn{ width:100%; }
+.gacha-idle{ margin:0; color:var(--muted); padding-top:8px; }
+.gacha-card{ display:grid; grid-template-columns:170px 1fr; gap:20px; align-items:start; }
+.gacha-card h3{ margin:0 0 8px; font-size:1.5rem; line-height:1.3; }
+.gacha-card h3:focus{ outline:none; }
+.gacha-card p{ margin:12px 0 0; }
+@media (max-width: 640px){
+  .gacha{ grid-template-columns:1fr; }
+  .gacha-card{ grid-template-columns:120px 1fr; gap:14px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ animation:none!important; transition:none!important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg viewBox="0 0 16 20" shape-rendering="crispEdges" aria-hidden="true">
+        <rect x="2" y="2" width="12" height="18" fill="#4A5568"/><rect x="4" y="0" width="8" height="2" fill="#4A5568"/>
+        <rect x="4" y="4" width="8" height="16" fill="#7D8696"/><rect x="7" y="4" width="2" height="16" fill="#C5B8F0"/>
+        <rect x="4" y="4" width="2" height="16" fill="#A3ABB8"/><rect x="6" y="2" width="4" height="2" fill="#D9AD70"/>
+      </svg>
+      <div>
+        <h1 id="site-title">中繼休息大廳</h1>
+        <p id="site-subtitle">The Interlude Lounge</p>
+      </div>
+    </div>
+    <button type="button" class="btn btn-quick" id="quick" aria-haspopup="dialog">
+      <svg class="btn-icon" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true">
+        <rect x="0" y="0" width="3" height="3" fill="currentColor"/><rect x="5" y="0" width="3" height="3" fill="currentColor"/>
+        <rect x="0" y="5" width="3" height="3" fill="currentColor"/><rect x="5" y="5" width="3" height="3" fill="#D9AD70"/>
+      </svg>
+      快速探索
+    </button>
+  </header>
+
+  <main>
+    <div class="stage-scroll" id="stage-scroll">
+      <div class="stage" id="stage">
+<svg id="scene" class="scene" viewBox="0 0 960 600" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="中繼休息大廳場景，包含七個可互動的家具">
+<defs>
+<pattern id="wallpaper" x="0" y="28" width="24" height="24" patternUnits="userSpaceOnUse">
+  <rect width="24" height="24" fill="#293747"/><rect width="2" height="24" fill="#2D3C4E"/>
+  <rect x="12" y="8" width="2" height="2" fill="#34465B"/><rect x="10" y="10" width="2" height="2" fill="#34465B"/>
+  <rect x="14" y="10" width="2" height="2" fill="#34465B"/><rect x="12" y="12" width="2" height="2" fill="#34465B"/>
+</pattern>
+<pattern id="planks" x="0" y="244" width="128" height="32" patternUnits="userSpaceOnUse">
+  <rect width="128" height="16" fill="#534F4E"/><rect y="16" width="128" height="16" fill="#4E4A49"/>
+  <rect width="128" height="2" fill="#5F5A59"/><rect y="16" width="128" height="2" fill="#5A5554"/>
+  <rect y="14" width="128" height="2" fill="#433F3F"/><rect y="30" width="128" height="2" fill="#403C3C"/>
+  <rect x="0" width="2" height="16" fill="#383535"/><rect x="72" width="2" height="16" fill="#383535"/>
+  <rect x="36" y="16" width="2" height="16" fill="#383535"/><rect x="104" y="16" width="2" height="16" fill="#383535"/>
+  <rect x="20" y="6" width="8" height="2" fill="#4A4645"/><rect x="96" y="9" width="6" height="2" fill="#4A4645"/>
+  <rect x="52" y="22" width="10" height="2" fill="#474342"/><rect x="116" y="25" width="6" height="2" fill="#474342"/>
+</pattern>
+<pattern id="cork" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+  <rect width="8" height="8" fill="#8C6B48"/><rect x="1" y="1" width="2" height="2" fill="#7A5C3D"/>
+  <rect x="5" y="4" width="2" height="2" fill="#9E7C56"/><rect x="2" y="6" width="2" height="1" fill="#7A5C3D"/>
+</pattern>
+<pattern id="scan" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+  <rect width="4" height="2" fill="#000" opacity=".22"/>
+</pattern>
+<linearGradient id="floorShade" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#05080D" stop-opacity=".28"/>
+</linearGradient>
+<radialGradient id="vig" cx=".5" cy=".46" r=".72">
+  <stop offset=".6" stop-color="#05080D" stop-opacity="0"/><stop offset="1" stop-color="#05080D" stop-opacity=".5"/>
+</radialGradient>
+</defs>
+<g aria-hidden="true">
+<rect x="0" y="0" width="960" height="600" fill="#161E2B"/><rect x="0" y="0" width="960" height="20" fill="#121925"/><rect x="0" y="20" width="960" height="4" fill="#3D4C60"/><rect x="0" y="24" width="960" height="4" fill="#1D2634"/><rect x="0" y="28" width="960" height="148" fill="url(#wallpaper)"/><rect x="0" y="28" width="960" height="6" fill="#000" opacity="0.18"/><rect x="0" y="176" width="960" height="2" fill="#B08A5E"/><rect x="0" y="178" width="960" height="4" fill="#7A5236"/><rect x="0" y="182" width="960" height="2" fill="#3D281B"/><rect x="0" y="184" width="960" height="48" fill="#3A3230"/><rect x="8" y="190" width="56" height="36" fill="#332B29"/><rect x="8" y="190" width="56" height="2" fill="#241D1C"/><rect x="8" y="190" width="2" height="36" fill="#241D1C"/><rect x="8" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="62" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="72" y="190" width="56" height="36" fill="#332B29"/><rect x="72" y="190" width="56" height="2" fill="#241D1C"/><rect x="72" y="190" width="2" height="36" fill="#241D1C"/><rect x="72" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="126" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="136" y="190" width="56" height="36" fill="#332B29"/><rect x="136" y="190" width="56" height="2" fill="#241D1C"/><rect x="136" y="190" width="2" height="36" fill="#241D1C"/><rect x="136" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="190" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="200" y="190" width="56" height="36" fill="#332B29"/><rect x="200" y="190" width="56" height="2" fill="#241D1C"/><rect x="200" y="190" width="2" height="36" fill="#241D1C"/><rect x="200" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="254" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="264" y="190" width="56" height="36" fill="#332B29"/><rect x="264" y="190" width="56" height="2" fill="#241D1C"/><rect x="264" y="190" width="2" height="36" fill="#241D1C"/><rect x="264" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="318" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="328" y="190" width="56" height="36" fill="#332B29"/><rect x="328" y="190" width="56" height="2" fill="#241D1C"/><rect x="328" y="190" width="2" height="36" fill="#241D1C"/><rect x="328" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="382" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="392" y="190" width="56" height="36" fill="#332B29"/><rect x="392" y="190" width="56" height="2" fill="#241D1C"/><rect x="392" y="190" width="2" height="36" fill="#241D1C"/><rect x="392" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="446" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="456" y="190" width="56" height="36" fill="#332B29"/><rect x="456" y="190" width="56" height="2" fill="#241D1C"/><rect x="456" y="190" width="2" height="36" fill="#241D1C"/><rect x="456" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="510" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="520" y="190" width="56" height="36" fill="#332B29"/><rect x="520" y="190" width="56" height="2" fill="#241D1C"/><rect x="520" y="190" width="2" height="36" fill="#241D1C"/><rect x="520" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="574" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="584" y="190" width="56" height="36" fill="#332B29"/><rect x="584" y="190" width="56" height="2" fill="#241D1C"/><rect x="584" y="190" width="2" height="36" fill="#241D1C"/><rect x="584" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="638" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="648" y="190" width="56" height="36" fill="#332B29"/><rect x="648" y="190" width="56" height="2" fill="#241D1C"/><rect x="648" y="190" width="2" height="36" fill="#241D1C"/><rect x="648" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="702" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="712" y="190" width="56" height="36" fill="#332B29"/><rect x="712" y="190" width="56" height="2" fill="#241D1C"/><rect x="712" y="190" width="2" height="36" fill="#241D1C"/><rect x="712" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="766" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="776" y="190" width="56" height="36" fill="#332B29"/><rect x="776" y="190" width="56" height="2" fill="#241D1C"/><rect x="776" y="190" width="2" height="36" fill="#241D1C"/><rect x="776" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="830" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="840" y="190" width="56" height="36" fill="#332B29"/><rect x="840" y="190" width="56" height="2" fill="#241D1C"/><rect x="840" y="190" width="2" height="36" fill="#241D1C"/><rect x="840" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="894" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="904" y="190" width="56" height="36" fill="#332B29"/><rect x="904" y="190" width="56" height="2" fill="#241D1C"/><rect x="904" y="190" width="2" height="36" fill="#241D1C"/><rect x="904" y="224" width="56" height="2" fill="#4A3F3A"/><rect x="958" y="190" width="2" height="36" fill="#4A3F3A"/><rect x="0" y="232" width="960" height="2" fill="#5A4436"/><rect x="0" y="234" width="960" height="10" fill="#2B1F18"/><rect x="0" y="244" width="960" height="356" fill="url(#planks)"/><rect x="0" y="244" width="960" height="356" fill="url(#floorShade)"/><rect x="0" y="244" width="960" height="6" fill="#000" opacity="0.38"/><rect x="0" y="250" width="960" height="8" fill="#000" opacity="0.16"/><rect x="0" y="0" width="12" height="600" fill="#10151F"/><rect x="12" y="0" width="4" height="600" fill="#2A3647"/><rect x="944" y="0" width="4" height="600" fill="#2A3647"/><rect x="948" y="0" width="12" height="600" fill="#10151F"/>
+<rect x="258" y="50" width="12" height="2" fill="#000" opacity="0.3"/><rect x="254" y="52" width="20" height="2" fill="#000" opacity="0.3"/><rect x="252" y="54" width="24" height="2" fill="#000" opacity="0.3"/><rect x="250" y="56" width="28" height="2" fill="#000" opacity="0.3"/><rect x="250" y="58" width="28" height="2" fill="#000" opacity="0.3"/><rect x="248" y="60" width="32" height="2" fill="#000" opacity="0.3"/><rect x="248" y="62" width="32" height="2" fill="#000" opacity="0.3"/><rect x="248" y="64" width="32" height="2" fill="#000" opacity="0.3"/><rect x="248" y="66" width="32" height="2" fill="#000" opacity="0.3"/><rect x="248" y="68" width="32" height="2" fill="#000" opacity="0.3"/><rect x="248" y="70" width="32" height="2" fill="#000" opacity="0.3"/><rect x="250" y="72" width="28" height="2" fill="#000" opacity="0.3"/><rect x="250" y="74" width="28" height="2" fill="#000" opacity="0.3"/><rect x="252" y="76" width="24" height="2" fill="#000" opacity="0.3"/><rect x="254" y="78" width="20" height="2" fill="#000" opacity="0.3"/><rect x="258" y="80" width="12" height="2" fill="#000" opacity="0.3"/><rect x="256" y="48" width="12" height="2" fill="#1A1410"/><rect x="252" y="50" width="20" height="2" fill="#1A1410"/><rect x="250" y="52" width="24" height="2" fill="#1A1410"/><rect x="248" y="54" width="28" height="2" fill="#1A1410"/><rect x="248" y="56" width="28" height="2" fill="#1A1410"/><rect x="246" y="58" width="32" height="2" fill="#1A1410"/><rect x="246" y="60" width="32" height="2" fill="#1A1410"/><rect x="246" y="62" width="32" height="2" fill="#1A1410"/><rect x="246" y="64" width="32" height="2" fill="#1A1410"/><rect x="246" y="66" width="32" height="2" fill="#1A1410"/><rect x="246" y="68" width="32" height="2" fill="#1A1410"/><rect x="248" y="70" width="28" height="2" fill="#1A1410"/><rect x="248" y="72" width="28" height="2" fill="#1A1410"/><rect x="250" y="74" width="24" height="2" fill="#1A1410"/><rect x="252" y="76" width="20" height="2" fill="#1A1410"/><rect x="256" y="78" width="12" height="2" fill="#1A1410"/><rect x="256" y="50" width="12" height="2" fill="#7A5236"/><rect x="254" y="52" width="16" height="2" fill="#7A5236"/><rect x="252" y="54" width="20" height="2" fill="#7A5236"/><rect x="250" y="56" width="24" height="2" fill="#7A5236"/><rect x="248" y="58" width="28" height="2" fill="#7A5236"/><rect x="248" y="60" width="28" height="2" fill="#7A5236"/><rect x="248" y="62" width="28" height="2" fill="#7A5236"/><rect x="248" y="64" width="28" height="2" fill="#7A5236"/><rect x="248" y="66" width="28" height="2" fill="#7A5236"/><rect x="248" y="68" width="28" height="2" fill="#7A5236"/><rect x="250" y="70" width="24" height="2" fill="#7A5236"/><rect x="252" y="72" width="20" height="2" fill="#7A5236"/><rect x="254" y="74" width="16" height="2" fill="#7A5236"/><rect x="256" y="76" width="12" height="2" fill="#7A5236"/><rect x="258" y="53" width="8" height="2" fill="#E9DDC5"/><rect x="254" y="55" width="16" height="2" fill="#E9DDC5"/><rect x="252" y="57" width="20" height="2" fill="#E9DDC5"/><rect x="252" y="59" width="20" height="2" fill="#E9DDC5"/><rect x="252" y="61" width="20" height="2" fill="#E9DDC5"/><rect x="250" y="63" width="24" height="2" fill="#E9DDC5"/><rect x="252" y="65" width="20" height="2" fill="#E9DDC5"/><rect x="252" y="67" width="20" height="2" fill="#E9DDC5"/><rect x="252" y="69" width="20" height="2" fill="#E9DDC5"/><rect x="254" y="71" width="16" height="2" fill="#E9DDC5"/><rect x="258" y="73" width="8" height="2" fill="#E9DDC5"/><rect x="254" y="70" width="16" height="4" fill="#D6C8AC"/><rect x="261" y="54" width="2" height="2" fill="#3A2C22"/><rect x="261" y="72" width="2" height="2" fill="#3A2C22"/><rect x="252" y="63" width="2" height="2" fill="#3A2C22"/><rect x="270" y="63" width="2" height="2" fill="#3A2C22"/><rect x="261" y="58" width="2" height="7" fill="#20252E"/><rect x="262" y="63" width="6" height="2" fill="#20252E"/><rect x="261" y="63" width="2" height="2" fill="#D9AD70"/><rect x="258" y="48" width="8" height="2" fill="#9A6B45"/><rect x="232" y="96" width="72" height="52" fill="#000" opacity="0.3"/><rect x="228" y="92" width="72" height="52" fill="#A77F4C"/><rect x="230" y="94" width="68" height="48" fill="#D9AD70"/><rect x="230" y="94" width="68" height="2" fill="#F0CF98"/><rect x="234" y="98" width="60" height="40" fill="#1E2A44"/><rect x="234" y="98" width="60" height="10" fill="#262250"/><rect x="234" y="108" width="60" height="10" fill="#24305A"/><rect x="240" y="102" width="2" height="2" fill="#E9DDC5"/><rect x="250" y="112" width="2" height="2" fill="#E9DDC5"/><rect x="262" y="100" width="2" height="2" fill="#E9DDC5"/><rect x="288" y="116" width="2" height="2" fill="#E9DDC5"/><rect x="244" y="120" width="2" height="2" fill="#E9DDC5"/><rect x="270" y="110" width="2" height="2" fill="#E9DDC5"/><rect x="276" y="102" width="8" height="2" fill="#E9DDC5"/><rect x="274" y="104" width="12" height="2" fill="#E9DDC5"/><rect x="274" y="106" width="12" height="2" fill="#E9DDC5"/><rect x="274" y="108" width="12" height="2" fill="#E9DDC5"/><rect x="274" y="110" width="12" height="2" fill="#E9DDC5"/><rect x="276" y="112" width="8" height="2" fill="#E9DDC5"/><rect x="276" y="104" width="4" height="4" fill="#D6C8AC"/><rect x="288" y="100" width="4" height="2" fill="#C5B8F0"/><rect x="288" y="102" width="4" height="2" fill="#C5B8F0"/><rect x="244" y="124" width="24" height="4" fill="#71998A"/><rect x="244" y="124" width="24" height="2" fill="#8FB6A6"/><rect x="246" y="128" width="20" height="2" fill="#5A4436"/><rect x="250" y="130" width="12" height="2" fill="#4A3830"/><rect x="254" y="132" width="4" height="2" fill="#3D2F28"/><rect x="254" y="114" width="4" height="10" fill="#E9DDC5"/><rect x="253" y="112" width="6" height="2" fill="#B5504A"/><rect x="234" y="134" width="60" height="4" fill="#22302F"/><rect x="330" y="108" width="4" height="10" fill="#5D6573"/><rect x="328" y="116" width="8" height="4" fill="#8A93A3"/><rect x="324" y="88" width="16" height="14" fill="#D9AD70"/><rect x="326" y="86" width="12" height="2" fill="#F0CF98"/><rect x="326" y="90" width="4" height="8" fill="#F0CF98"/><rect x="326" y="100" width="12" height="2" fill="#FFF2C8"/><rect x="328" y="102" width="8" height="6" fill="#5D6573"/><rect x="610" y="108" width="4" height="10" fill="#5D6573"/><rect x="608" y="116" width="8" height="4" fill="#8A93A3"/><rect x="604" y="88" width="16" height="14" fill="#D9AD70"/><rect x="606" y="86" width="12" height="2" fill="#F0CF98"/><rect x="606" y="90" width="4" height="8" fill="#F0CF98"/><rect x="606" y="100" width="12" height="2" fill="#FFF2C8"/><rect x="608" y="102" width="8" height="6" fill="#5D6573"/>
+<rect x="40" y="396" width="296" height="160" fill="#4A2F3D"/><rect x="48" y="404" width="280" height="144" fill="#6B3F50"/><rect x="56" y="412" width="264" height="128" fill="#4A2F3D"/><rect x="52" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="52" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="60" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="60" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="68" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="68" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="76" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="76" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="84" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="84" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="92" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="92" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="100" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="100" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="108" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="108" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="116" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="116" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="124" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="124" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="132" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="132" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="140" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="140" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="148" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="148" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="156" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="156" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="164" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="164" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="172" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="172" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="180" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="180" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="188" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="188" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="196" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="196" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="204" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="204" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="212" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="212" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="220" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="220" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="228" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="228" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="236" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="236" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="244" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="244" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="252" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="252" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="260" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="260" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="268" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="268" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="276" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="276" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="284" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="284" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="292" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="292" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="300" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="300" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="308" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="308" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="316" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="316" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="324" y="400" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="324" y="550" width="4" height="2" fill="#E9DDC5" opacity="0.35"/><rect x="80" y="432" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="76" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="84" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="80" y="440" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="80" y="472" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="76" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="84" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="80" y="480" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="80" y="512" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="76" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="84" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="80" y="520" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="128" y="432" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="124" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="132" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="128" y="440" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="128" y="472" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="124" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="132" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="128" y="480" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="128" y="512" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="124" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="132" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="128" y="520" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="176" y="432" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="172" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="180" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="176" y="440" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="176" y="472" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="172" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="180" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="176" y="480" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="176" y="512" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="172" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="180" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="176" y="520" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="224" y="432" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="220" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="228" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="224" y="440" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="224" y="472" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="220" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="228" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="224" y="480" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="224" y="512" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="220" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="228" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="224" y="520" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="272" y="432" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="268" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="276" y="436" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="272" y="440" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="272" y="472" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="268" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="276" y="476" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="272" y="480" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="272" y="512" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="268" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="276" y="516" width="4" height="4" fill="#A77F4C" opacity="0.5"/><rect x="272" y="520" width="4" height="4" fill="#A77F4C" opacity="0.7"/><rect x="34" y="400" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="400" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="408" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="408" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="416" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="416" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="424" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="424" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="432" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="432" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="440" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="440" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="448" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="448" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="456" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="456" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="464" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="464" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="472" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="472" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="480" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="480" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="488" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="488" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="496" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="496" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="504" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="504" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="512" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="512" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="520" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="520" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="528" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="528" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="536" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="536" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="544" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="544" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="34" y="552" width="6" height="4" fill="#D6C8AC" opacity="0.8"/><rect x="336" y="552" width="6" height="4" fill="#D6C8AC" opacity="0.8"/>
+<rect x="392" y="284" width="176" height="52" fill="#22324A"/><rect x="396" y="288" width="168" height="44" fill="#2C4060"/><rect x="400" y="292" width="160" height="36" fill="#22324A"/><rect x="404" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="416" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="428" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="440" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="452" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="464" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="476" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="488" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="500" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="512" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="524" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="536" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="548" y="309" width="6" height="2" fill="#A77F4C" opacity="0.6"/><rect x="392" y="284" width="176" height="2" fill="#000" opacity="0.25"/><rect x="404" y="566" width="152" height="34" fill="#2B1F18"/><rect x="408" y="570" width="144" height="30" fill="#5A3A27"/><rect x="412" y="574" width="136" height="26" fill="#6B4630"/><rect x="416" y="578" width="4" height="22" fill="#5A3A27"/><rect x="424" y="578" width="4" height="22" fill="#5A3A27"/><rect x="432" y="578" width="4" height="22" fill="#5A3A27"/><rect x="440" y="578" width="4" height="22" fill="#5A3A27"/><rect x="448" y="578" width="4" height="22" fill="#5A3A27"/><rect x="456" y="578" width="4" height="22" fill="#5A3A27"/><rect x="464" y="578" width="4" height="22" fill="#5A3A27"/><rect x="472" y="578" width="4" height="22" fill="#5A3A27"/><rect x="480" y="578" width="4" height="22" fill="#5A3A27"/><rect x="488" y="578" width="4" height="22" fill="#5A3A27"/><rect x="496" y="578" width="4" height="22" fill="#5A3A27"/><rect x="504" y="578" width="4" height="22" fill="#5A3A27"/><rect x="512" y="578" width="4" height="22" fill="#5A3A27"/><rect x="520" y="578" width="4" height="22" fill="#5A3A27"/><rect x="528" y="578" width="4" height="22" fill="#5A3A27"/><rect x="536" y="578" width="4" height="22" fill="#5A3A27"/><rect x="544" y="578" width="4" height="22" fill="#5A3A27"/><rect x="408" y="570" width="144" height="2" fill="#7F573B"/>
+<rect x="40" y="252" width="176" height="8" fill="#000" opacity="0.3"/><rect x="338" y="268" width="292" height="8" fill="#000" opacity="0.32"/><rect x="66" y="436" width="170" height="8" fill="#000" opacity="0.3"/><rect x="108" y="494" width="100" height="6" fill="#000" opacity="0.3"/><rect x="30" y="440" width="28" height="4" fill="#000" opacity="0.3"/>
+<ellipse cx="268" cy="258" rx="22" ry="5" fill="#000" opacity="0.32"/><polygon points="266,226 240,180 248,176 270,222" fill="#3F6B4F"/><polygon points="266,226 258,164 266,162 272,224" fill="#5A8A64"/><polygon points="268,226 288,172 296,176 272,226" fill="#4C7A58"/><polygon points="266,226 236,204 238,210 268,228" fill="#3F6B4F"/><polygon points="270,226 298,198 300,204 272,228" fill="#5A8A64"/><polygon points="266,222 260,168 262,168 268,222" fill="#7AA67A"/><rect x="252" y="226" width="28" height="30" fill="#8A5A3C"/><rect x="248" y="222" width="36" height="6" fill="#A8714B"/><rect x="250" y="220" width="32" height="2" fill="#C08A5E"/><rect x="272" y="228" width="8" height="28" fill="#6E4630"/><rect x="254" y="228" width="2" height="24" fill="#A8714B"/><rect x="252" y="252" width="28" height="4" fill="#5A3A27"/>
+</g>
+<g class="hot" id="hot-B" data-panel="B" tabindex="0" role="button" aria-label="書櫃：開啟角色圖庫"><g class="art"><rect x="150" y="36" width="40" height="8" fill="#3F5F8A"/><rect x="150" y="36" width="40" height="2" fill="#5F7FAA"/><rect x="154" y="30" width="32" height="6" fill="#8E3B3B"/><rect x="154" y="30" width="32" height="2" fill="#AE5B5B"/><rect x="186" y="38" width="4" height="4" fill="#E9DDC5"/><rect x="64" y="34" width="14" height="10" fill="#A8714B"/><rect x="62" y="32" width="18" height="3" fill="#C08A5E"/><rect x="66" y="22" width="4" height="10" fill="#5A8A64"/><rect x="70" y="18" width="4" height="14" fill="#7AA67A"/><rect x="74" y="24" width="4" height="8" fill="#5A8A64"/><rect x="34" y="42" width="180" height="212" fill="#1A1410"/><rect x="36" y="44" width="176" height="8" fill="#9A6B45"/><rect x="36" y="44" width="176" height="2" fill="#B39073"/><rect x="36" y="52" width="176" height="4" fill="#7A5236"/><rect x="36" y="56" width="12" height="184" fill="#7A5236"/><rect x="36" y="56" width="2" height="184" fill="#9A6B45"/><rect x="200" y="56" width="12" height="184" fill="#573A27"/><rect x="46" y="56" width="2" height="180" fill="#3D281B"/><rect x="48" y="56" width="152" height="180" fill="#2B1F18"/><rect x="86" y="56" width="2" height="180" fill="#241A14"/><rect x="124" y="56" width="2" height="180" fill="#241A14"/><rect x="162" y="56" width="2" height="180" fill="#241A14"/><rect x="50" y="62" width="8" height="34" fill="#8E3B3B"/><rect x="50" y="62" width="8" height="2" fill="#AA6C6C"/><rect x="50" y="62" width="2" height="34" fill="#9E5858"/><rect x="56" y="62" width="2" height="34" fill="#632929"/><rect x="50" y="68" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="52" y="86" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="58" y="66" width="6" height="30" fill="#6A4A7A"/><rect x="58" y="66" width="6" height="2" fill="#8F779B"/><rect x="58" y="66" width="2" height="30" fill="#80658D"/><rect x="62" y="66" width="2" height="30" fill="#4A3355"/><rect x="58" y="72" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="60" y="86" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="64" y="62" width="6" height="34" fill="#3F5F8A"/><rect x="64" y="62" width="6" height="2" fill="#6F87A7"/><rect x="64" y="62" width="2" height="34" fill="#5B779B"/><rect x="68" y="62" width="2" height="34" fill="#2C4260"/><rect x="72" y="68" width="8" height="28" fill="#8E3B3B"/><rect x="72" y="68" width="8" height="2" fill="#AA6C6C"/><rect x="72" y="68" width="2" height="28" fill="#9E5858"/><rect x="78" y="68" width="2" height="28" fill="#632929"/><rect x="72" y="74" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="74" y="86" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="80" y="64" width="6" height="32" fill="#A2793C"/><rect x="80" y="64" width="6" height="2" fill="#B99A6C"/><rect x="80" y="64" width="2" height="32" fill="#AF8D59"/><rect x="84" y="64" width="2" height="32" fill="#71542A"/><rect x="82" y="86" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="86" y="64" width="8" height="32" fill="#6A4A7A"/><rect x="86" y="64" width="8" height="2" fill="#8F779B"/><rect x="86" y="64" width="2" height="32" fill="#80658D"/><rect x="92" y="64" width="2" height="32" fill="#4A3355"/><rect x="88" y="86" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="96" y="66" width="8" height="30" fill="#4D4A6E"/><rect x="96" y="66" width="8" height="2" fill="#797792"/><rect x="96" y="66" width="2" height="30" fill="#676583"/><rect x="102" y="66" width="2" height="30" fill="#35334D"/><rect x="96" y="72" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="98" y="86" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="104" y="66" width="6" height="30" fill="#7A3F55"/><rect x="104" y="66" width="6" height="2" fill="#9B6F7F"/><rect x="104" y="66" width="2" height="30" fill="#8D5B6E"/><rect x="108" y="66" width="2" height="30" fill="#552C3B"/><rect x="104" y="72" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="110" y="62" width="6" height="34" fill="#3F5F8A"/><rect x="110" y="62" width="6" height="2" fill="#6F87A7"/><rect x="110" y="62" width="2" height="34" fill="#5B779B"/><rect x="114" y="62" width="2" height="34" fill="#2C4260"/><rect x="110" y="68" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="116" y="64" width="8" height="32" fill="#2F6B6B"/><rect x="116" y="64" width="8" height="2" fill="#639090"/><rect x="116" y="64" width="2" height="32" fill="#4E8181"/><rect x="122" y="64" width="2" height="32" fill="#204A4A"/><rect x="116" y="70" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="124" y="64" width="8" height="32" fill="#A2793C"/><rect x="124" y="64" width="8" height="2" fill="#B99A6C"/><rect x="124" y="64" width="2" height="32" fill="#AF8D59"/><rect x="130" y="64" width="2" height="32" fill="#71542A"/><rect x="124" y="70" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="126" y="86" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="132" y="66" width="8" height="30" fill="#2F6B6B"/><rect x="132" y="66" width="8" height="2" fill="#639090"/><rect x="132" y="66" width="2" height="30" fill="#4E8181"/><rect x="138" y="66" width="2" height="30" fill="#204A4A"/><rect x="132" y="72" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="140" y="66" width="8" height="30" fill="#4D4A6E"/><rect x="140" y="66" width="8" height="2" fill="#797792"/><rect x="140" y="66" width="2" height="30" fill="#676583"/><rect x="146" y="66" width="2" height="30" fill="#35334D"/><rect x="142" y="86" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="166" y="92" width="20" height="4" fill="#A77F4C"/><rect x="174" y="86" width="4" height="6" fill="#A77F4C"/><rect x="172" y="65" width="8" height="2" fill="#3F6B8A"/><rect x="168" y="67" width="16" height="2" fill="#3F6B8A"/><rect x="168" y="69" width="16" height="2" fill="#3F6B8A"/><rect x="166" y="71" width="20" height="2" fill="#3F6B8A"/><rect x="166" y="73" width="20" height="2" fill="#3F6B8A"/><rect x="166" y="75" width="20" height="2" fill="#3F6B8A"/><rect x="166" y="77" width="20" height="2" fill="#3F6B8A"/><rect x="168" y="79" width="16" height="2" fill="#3F6B8A"/><rect x="168" y="81" width="16" height="2" fill="#3F6B8A"/><rect x="172" y="83" width="8" height="2" fill="#3F6B8A"/><rect x="170" y="68" width="6" height="4" fill="#5A8A64"/><rect x="176" y="74" width="8" height="6" fill="#5A8A64"/><rect x="168" y="78" width="4" height="4" fill="#5A8A64"/><rect x="170" y="68" width="2" height="2" fill="#9FC3DB"/><rect x="185" y="70" width="2" height="14" fill="#A77F4C"/><rect x="176" y="64" width="2" height="2" fill="#A77F4C"/><rect x="74" y="114" width="6" height="30" fill="#8E3B3B"/><rect x="74" y="114" width="6" height="2" fill="#AA6C6C"/><rect x="74" y="114" width="2" height="30" fill="#9E5858"/><rect x="78" y="114" width="2" height="30" fill="#632929"/><rect x="80" y="120" width="10" height="24" fill="#3F5F8A"/><rect x="80" y="120" width="10" height="2" fill="#6F87A7"/><rect x="80" y="120" width="2" height="24" fill="#5B779B"/><rect x="88" y="120" width="2" height="24" fill="#2C4260"/><rect x="80" y="126" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="90" y="110" width="6" height="34" fill="#3F5F8A"/><rect x="90" y="110" width="6" height="2" fill="#6F87A7"/><rect x="90" y="110" width="2" height="34" fill="#5B779B"/><rect x="94" y="110" width="2" height="34" fill="#2C4260"/><rect x="90" y="116" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="96" y="116" width="8" height="28" fill="#A2793C"/><rect x="96" y="116" width="8" height="2" fill="#B99A6C"/><rect x="96" y="116" width="2" height="28" fill="#AF8D59"/><rect x="102" y="116" width="2" height="28" fill="#71542A"/><rect x="96" y="122" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="104" y="112" width="10" height="32" fill="#A2793C"/><rect x="104" y="112" width="10" height="2" fill="#B99A6C"/><rect x="104" y="112" width="2" height="32" fill="#AF8D59"/><rect x="112" y="112" width="2" height="32" fill="#71542A"/><rect x="104" y="118" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="106" y="134" width="6" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="114" y="116" width="8" height="28" fill="#B9A27A"/><rect x="114" y="116" width="8" height="2" fill="#CAB99B"/><rect x="114" y="116" width="2" height="28" fill="#C3AF8D"/><rect x="120" y="116" width="2" height="28" fill="#817155"/><rect x="122" y="110" width="8" height="34" fill="#A2793C"/><rect x="122" y="110" width="8" height="2" fill="#B99A6C"/><rect x="122" y="110" width="2" height="34" fill="#AF8D59"/><rect x="128" y="110" width="2" height="34" fill="#71542A"/><rect x="122" y="116" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="124" y="134" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="130" y="112" width="10" height="32" fill="#7A3F55"/><rect x="130" y="112" width="10" height="2" fill="#9B6F7F"/><rect x="130" y="112" width="2" height="32" fill="#8D5B6E"/><rect x="138" y="112" width="2" height="32" fill="#552C3B"/><rect x="130" y="118" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="132" y="134" width="6" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="142" y="116" width="6" height="28" fill="#7A3F55"/><rect x="142" y="116" width="6" height="2" fill="#9B6F7F"/><rect x="142" y="116" width="2" height="28" fill="#8D5B6E"/><rect x="146" y="116" width="2" height="28" fill="#552C3B"/><rect x="144" y="134" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="148" y="116" width="6" height="28" fill="#7A3F55"/><rect x="148" y="116" width="6" height="2" fill="#9B6F7F"/><rect x="148" y="116" width="2" height="28" fill="#8D5B6E"/><rect x="152" y="116" width="2" height="28" fill="#552C3B"/><rect x="150" y="134" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="154" y="120" width="8" height="24" fill="#6A4A7A"/><rect x="154" y="120" width="8" height="2" fill="#8F779B"/><rect x="154" y="120" width="2" height="24" fill="#80658D"/><rect x="160" y="120" width="2" height="24" fill="#4A3355"/><rect x="154" y="126" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="156" y="134" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="162" y="120" width="6" height="24" fill="#A2793C"/><rect x="162" y="120" width="6" height="2" fill="#B99A6C"/><rect x="162" y="120" width="2" height="24" fill="#AF8D59"/><rect x="166" y="120" width="2" height="24" fill="#71542A"/><rect x="164" y="134" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><polygon points="174,144 182,144 196,114 189,111" fill="#3F5F8A"/><polygon points="178,136 181,136 186,126 183,125" fill="#D9AD70" opacity="0.8"/><rect x="52" y="132" width="16" height="12" fill="#A8714B"/><rect x="50" y="130" width="20" height="4" fill="#C08A5E"/><rect x="62" y="134" width="6" height="10" fill="#8A5A3C"/><rect x="54" y="122" width="4" height="8" fill="#5A8A64"/><rect x="60" y="118" width="4" height="12" fill="#7AA67A"/><rect x="64" y="124" width="6" height="6" fill="#5A8A64"/><rect x="50" y="126" width="4" height="4" fill="#4C7A58"/><rect x="46" y="136" width="4" height="6" fill="#5A8A64"/><rect x="44" y="142" width="4" height="8" fill="#4C7A58"/><rect x="46" y="150" width="4" height="6" fill="#7AA67A"/><rect x="48" y="156" width="4" height="4" fill="#5A8A64"/><rect x="50" y="168" width="6" height="24" fill="#6A4A7A"/><rect x="50" y="168" width="6" height="2" fill="#8F779B"/><rect x="50" y="168" width="2" height="24" fill="#80658D"/><rect x="54" y="168" width="2" height="24" fill="#4A3355"/><rect x="50" y="174" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="56" y="162" width="10" height="30" fill="#7A3F55"/><rect x="56" y="162" width="10" height="2" fill="#9B6F7F"/><rect x="56" y="162" width="2" height="30" fill="#8D5B6E"/><rect x="64" y="162" width="2" height="30" fill="#552C3B"/><rect x="56" y="168" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="58" y="182" width="6" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="66" y="158" width="6" height="34" fill="#4D4A6E"/><rect x="66" y="158" width="6" height="2" fill="#797792"/><rect x="66" y="158" width="2" height="34" fill="#676583"/><rect x="70" y="158" width="2" height="34" fill="#35334D"/><rect x="66" y="164" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="68" y="182" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="72" y="164" width="8" height="28" fill="#2F6B6B"/><rect x="72" y="164" width="8" height="2" fill="#639090"/><rect x="72" y="164" width="2" height="28" fill="#4E8181"/><rect x="78" y="164" width="2" height="28" fill="#204A4A"/><rect x="72" y="170" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="80" y="162" width="8" height="30" fill="#B9A27A"/><rect x="80" y="162" width="8" height="2" fill="#CAB99B"/><rect x="80" y="162" width="2" height="30" fill="#C3AF8D"/><rect x="86" y="162" width="2" height="30" fill="#817155"/><rect x="80" y="168" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="88" y="164" width="10" height="28" fill="#7A3F55"/><rect x="88" y="164" width="10" height="2" fill="#9B6F7F"/><rect x="88" y="164" width="2" height="28" fill="#8D5B6E"/><rect x="96" y="164" width="2" height="28" fill="#552C3B"/><rect x="88" y="170" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="90" y="182" width="6" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="98" y="162" width="8" height="30" fill="#7A3F55"/><rect x="98" y="162" width="8" height="2" fill="#9B6F7F"/><rect x="98" y="162" width="2" height="30" fill="#8D5B6E"/><rect x="104" y="162" width="2" height="30" fill="#552C3B"/><rect x="98" y="168" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="106" y="160" width="8" height="32" fill="#4D4A6E"/><rect x="106" y="160" width="8" height="2" fill="#797792"/><rect x="106" y="160" width="2" height="32" fill="#676583"/><rect x="112" y="160" width="2" height="32" fill="#35334D"/><rect x="106" y="166" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="108" y="182" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="114" y="162" width="6" height="30" fill="#4D4A6E"/><rect x="114" y="162" width="6" height="2" fill="#797792"/><rect x="114" y="162" width="2" height="30" fill="#676583"/><rect x="118" y="162" width="2" height="30" fill="#35334D"/><rect x="114" y="168" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="122" y="184" width="38" height="8" fill="#3F5F8A"/><rect x="122" y="184" width="38" height="2" fill="#5F7FAA"/><rect x="154" y="186" width="4" height="4" fill="#E9DDC5"/><rect x="126" y="176" width="32" height="8" fill="#8E3B3B"/><rect x="126" y="176" width="32" height="2" fill="#AE5B5B"/><rect x="152" y="178" width="4" height="4" fill="#E9DDC5"/><rect x="124" y="168" width="34" height="8" fill="#A2793C"/><rect x="124" y="168" width="34" height="2" fill="#C2994C"/><rect x="150" y="170" width="4" height="4" fill="#E9DDC5"/><rect x="166" y="188" width="20" height="4" fill="#A77F4C"/><polygon points="176,160 184,172 182,188 170,188 168,172" fill="#9B89D1"/><polygon points="176,160 178,170 174,188 170,188 168,172" fill="#C5B8F0"/><rect x="172" y="172" width="2" height="8" fill="#FFFFFF" opacity="0.6"/><rect x="50" y="210" width="10" height="26" fill="#3F5F8A"/><rect x="50" y="210" width="10" height="2" fill="#6F87A7"/><rect x="50" y="210" width="2" height="26" fill="#5B779B"/><rect x="58" y="210" width="2" height="26" fill="#2C4260"/><rect x="50" y="216" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="60" y="212" width="8" height="24" fill="#3F5F8A"/><rect x="60" y="212" width="8" height="2" fill="#6F87A7"/><rect x="60" y="212" width="2" height="24" fill="#5B779B"/><rect x="66" y="212" width="2" height="24" fill="#2C4260"/><rect x="68" y="206" width="6" height="30" fill="#5A7A4A"/><rect x="68" y="206" width="6" height="2" fill="#839B77"/><rect x="68" y="206" width="2" height="30" fill="#728D65"/><rect x="72" y="206" width="2" height="30" fill="#3E5533"/><rect x="70" y="226" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="74" y="216" width="8" height="20" fill="#6A4A7A"/><rect x="74" y="216" width="8" height="2" fill="#8F779B"/><rect x="74" y="216" width="2" height="20" fill="#80658D"/><rect x="80" y="216" width="2" height="20" fill="#4A3355"/><rect x="74" y="222" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="82" y="208" width="10" height="28" fill="#3F5F8A"/><rect x="82" y="208" width="10" height="2" fill="#6F87A7"/><rect x="82" y="208" width="2" height="28" fill="#5B779B"/><rect x="90" y="208" width="2" height="28" fill="#2C4260"/><rect x="82" y="214" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="84" y="226" width="6" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="94" y="210" width="6" height="26" fill="#B9A27A"/><rect x="94" y="210" width="6" height="2" fill="#CAB99B"/><rect x="94" y="210" width="2" height="26" fill="#C3AF8D"/><rect x="98" y="210" width="2" height="26" fill="#817155"/><rect x="100" y="216" width="10" height="20" fill="#2F6B6B"/><rect x="100" y="216" width="10" height="2" fill="#639090"/><rect x="100" y="216" width="2" height="20" fill="#4E8181"/><rect x="108" y="216" width="2" height="20" fill="#204A4A"/><rect x="100" y="222" width="10" height="2" fill="#D9AD70" opacity="0.75"/><rect x="102" y="226" width="6" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="114" y="216" width="36" height="20" fill="#9A6B45"/><rect x="112" y="212" width="40" height="6" fill="#7A5236"/><rect x="112" y="212" width="40" height="2" fill="#A18572"/><rect x="114" y="222" width="36" height="2" fill="#A77F4C"/><rect x="130" y="220" width="4" height="8" fill="#D9AD70"/><rect x="146" y="218" width="4" height="18" fill="#573A27"/><rect x="156" y="210" width="8" height="26" fill="#2F6B6B"/><rect x="156" y="210" width="8" height="2" fill="#639090"/><rect x="156" y="210" width="2" height="26" fill="#4E8181"/><rect x="162" y="210" width="2" height="26" fill="#204A4A"/><rect x="156" y="216" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="164" y="216" width="6" height="20" fill="#B9A27A"/><rect x="164" y="216" width="6" height="2" fill="#CAB99B"/><rect x="164" y="216" width="2" height="20" fill="#C3AF8D"/><rect x="168" y="216" width="2" height="20" fill="#817155"/><rect x="164" y="222" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="166" y="226" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="170" y="210" width="6" height="26" fill="#2F6B6B"/><rect x="170" y="210" width="6" height="2" fill="#639090"/><rect x="170" y="210" width="2" height="26" fill="#4E8181"/><rect x="174" y="210" width="2" height="26" fill="#204A4A"/><rect x="170" y="216" width="6" height="2" fill="#D9AD70" opacity="0.75"/><rect x="172" y="226" width="2" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="176" y="216" width="8" height="20" fill="#5A7A4A"/><rect x="176" y="216" width="8" height="2" fill="#839B77"/><rect x="176" y="216" width="2" height="20" fill="#728D65"/><rect x="182" y="216" width="2" height="20" fill="#3E5533"/><rect x="176" y="222" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="178" y="226" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="184" y="206" width="8" height="30" fill="#6A4A7A"/><rect x="184" y="206" width="8" height="2" fill="#8F779B"/><rect x="184" y="206" width="2" height="30" fill="#80658D"/><rect x="190" y="206" width="2" height="30" fill="#4A3355"/><rect x="184" y="212" width="8" height="2" fill="#D9AD70" opacity="0.75"/><rect x="186" y="226" width="4" height="2" fill="#E9DDC5" opacity="0.55"/><rect x="48" y="96" width="152" height="2" fill="#9A6B45"/><rect x="48" y="98" width="152" height="4" fill="#7A5236"/><rect x="48" y="102" width="152" height="2" fill="#3D281B"/><rect x="48" y="144" width="152" height="2" fill="#9A6B45"/><rect x="48" y="146" width="152" height="4" fill="#7A5236"/><rect x="48" y="150" width="152" height="2" fill="#3D281B"/><rect x="48" y="192" width="152" height="2" fill="#9A6B45"/><rect x="48" y="194" width="152" height="4" fill="#7A5236"/><rect x="48" y="198" width="152" height="2" fill="#3D281B"/><rect x="48" y="56" width="152" height="4" fill="#000" opacity="0.35"/><rect x="48" y="104" width="152" height="4" fill="#000" opacity="0.35"/><rect x="48" y="152" width="152" height="4" fill="#000" opacity="0.35"/><rect x="48" y="200" width="152" height="4" fill="#000" opacity="0.35"/><rect x="48" y="56" width="6" height="180" fill="#000" opacity="0.18"/><rect x="36" y="236" width="176" height="16" fill="#7A5236"/><rect x="36" y="236" width="176" height="2" fill="#9A6B45"/><rect x="44" y="240" width="160" height="6" fill="#573A27"/><rect x="36" y="248" width="176" height="4" fill="#3D281B"/><rect x="200" y="236" width="12" height="16" fill="#573A27"/></g><rect class="hit" x="32" y="18" width="184" height="242" fill="transparent"/></g>
+<g class="hot" id="hot-A" data-panel="A" tabindex="0" role="button" aria-label="接待櫃台：開啟大廳導覽"><g class="art"><rect x="446" y="28" width="2" height="16" fill="#5D6573"/><rect x="514" y="28" width="2" height="16" fill="#5D6573"/><rect x="434" y="42" width="92" height="22" fill="#1A1410"/><rect x="436" y="44" width="88" height="18" fill="#7A5236"/><rect x="438" y="46" width="84" height="14" fill="#3D281B"/><rect x="436" y="44" width="88" height="2" fill="#9A6B45"/><rect x="445" y="48" width="4" height="2" fill="#F0CF98"/><rect x="445" y="50" width="2" height="2" fill="#F0CF98"/><rect x="449" y="50" width="2" height="2" fill="#F0CF98"/><rect x="445" y="52" width="4" height="2" fill="#F0CF98"/><rect x="445" y="54" width="2" height="2" fill="#F0CF98"/><rect x="449" y="54" width="2" height="2" fill="#F0CF98"/><rect x="445" y="56" width="2" height="2" fill="#F0CF98"/><rect x="449" y="56" width="2" height="2" fill="#F0CF98"/><rect x="453" y="48" width="6" height="2" fill="#F0CF98"/><rect x="453" y="50" width="2" height="2" fill="#F0CF98"/><rect x="453" y="52" width="4" height="2" fill="#F0CF98"/><rect x="453" y="54" width="2" height="2" fill="#F0CF98"/><rect x="453" y="56" width="6" height="2" fill="#F0CF98"/><rect x="463" y="48" width="4" height="2" fill="#F0CF98"/><rect x="461" y="50" width="2" height="2" fill="#F0CF98"/><rect x="461" y="52" width="2" height="2" fill="#F0CF98"/><rect x="461" y="54" width="2" height="2" fill="#F0CF98"/><rect x="463" y="56" width="4" height="2" fill="#F0CF98"/><rect x="469" y="48" width="6" height="2" fill="#F0CF98"/><rect x="469" y="50" width="2" height="2" fill="#F0CF98"/><rect x="469" y="52" width="4" height="2" fill="#F0CF98"/><rect x="469" y="54" width="2" height="2" fill="#F0CF98"/><rect x="469" y="56" width="6" height="2" fill="#F0CF98"/><rect x="477" y="48" width="4" height="2" fill="#F0CF98"/><rect x="477" y="50" width="2" height="2" fill="#F0CF98"/><rect x="481" y="50" width="2" height="2" fill="#F0CF98"/><rect x="477" y="52" width="4" height="2" fill="#F0CF98"/><rect x="477" y="54" width="2" height="2" fill="#F0CF98"/><rect x="477" y="56" width="2" height="2" fill="#F0CF98"/><rect x="485" y="48" width="6" height="2" fill="#F0CF98"/><rect x="487" y="50" width="2" height="2" fill="#F0CF98"/><rect x="487" y="52" width="2" height="2" fill="#F0CF98"/><rect x="487" y="54" width="2" height="2" fill="#F0CF98"/><rect x="487" y="56" width="2" height="2" fill="#F0CF98"/><rect x="493" y="48" width="6" height="2" fill="#F0CF98"/><rect x="495" y="50" width="2" height="2" fill="#F0CF98"/><rect x="495" y="52" width="2" height="2" fill="#F0CF98"/><rect x="495" y="54" width="2" height="2" fill="#F0CF98"/><rect x="493" y="56" width="6" height="2" fill="#F0CF98"/><rect x="501" y="48" width="6" height="2" fill="#F0CF98"/><rect x="501" y="50" width="2" height="2" fill="#F0CF98"/><rect x="505" y="50" width="2" height="2" fill="#F0CF98"/><rect x="501" y="52" width="2" height="2" fill="#F0CF98"/><rect x="505" y="52" width="2" height="2" fill="#F0CF98"/><rect x="501" y="54" width="2" height="2" fill="#F0CF98"/><rect x="505" y="54" width="2" height="2" fill="#F0CF98"/><rect x="501" y="56" width="6" height="2" fill="#F0CF98"/><rect x="509" y="48" width="4" height="2" fill="#F0CF98"/><rect x="509" y="50" width="2" height="2" fill="#F0CF98"/><rect x="513" y="50" width="2" height="2" fill="#F0CF98"/><rect x="509" y="52" width="2" height="2" fill="#F0CF98"/><rect x="513" y="52" width="2" height="2" fill="#F0CF98"/><rect x="509" y="54" width="2" height="2" fill="#F0CF98"/><rect x="513" y="54" width="2" height="2" fill="#F0CF98"/><rect x="509" y="56" width="2" height="2" fill="#F0CF98"/><rect x="513" y="56" width="2" height="2" fill="#F0CF98"/><rect x="384" y="100" width="192" height="2" fill="#9A6B45"/><rect x="384" y="102" width="192" height="4" fill="#7A5236"/><rect x="384" y="106" width="192" height="2" fill="#3D281B"/><rect x="384" y="108" width="192" height="4" fill="#000" opacity="0.22"/><rect x="392" y="108" width="4" height="8" fill="#573A27"/><rect x="564" y="108" width="4" height="8" fill="#573A27"/><rect x="384" y="140" width="192" height="2" fill="#9A6B45"/><rect x="384" y="142" width="192" height="4" fill="#7A5236"/><rect x="384" y="146" width="192" height="2" fill="#3D281B"/><rect x="384" y="148" width="192" height="4" fill="#000" opacity="0.22"/><rect x="392" y="148" width="4" height="8" fill="#573A27"/><rect x="564" y="148" width="4" height="8" fill="#573A27"/><rect x="392" y="86" width="8" height="14" fill="#71998A"/><rect x="395" y="80" width="2" height="6" fill="#557A6D"/><rect x="395" y="78" width="2" height="2" fill="#A8714B"/><rect x="393" y="88" width="2" height="8" fill="#8FB6A6"/><rect x="404" y="88" width="12" height="12" fill="#6D5EA3"/><rect x="403" y="86" width="14" height="3" fill="#8A93A3"/><rect x="405" y="90" width="2" height="8" fill="#9B89D1"/><rect x="422" y="80" width="6" height="20" fill="#8E3B3B"/><rect x="428" y="82" width="6" height="18" fill="#3F5F8A"/><rect x="434" y="78" width="6" height="22" fill="#A2793C"/><rect x="422" y="84" width="6" height="2" fill="#D9AD70"/><rect x="434" y="84" width="6" height="2" fill="#D9AD70"/><rect x="450" y="88" width="10" height="12" fill="#9FB3C4" opacity="0.45"/><rect x="452" y="92" width="6" height="8" fill="#D8746A"/><rect x="450" y="86" width="10" height="2" fill="#8A93A3"/><rect x="451" y="90" width="2" height="6" fill="#FFFFFF" opacity="0.4"/><rect x="462" y="88" width="10" height="12" fill="#9FB3C4" opacity="0.45"/><rect x="464" y="92" width="6" height="8" fill="#71998A"/><rect x="462" y="86" width="10" height="2" fill="#8A93A3"/><rect x="463" y="90" width="2" height="6" fill="#FFFFFF" opacity="0.4"/><rect x="474" y="88" width="10" height="12" fill="#9FB3C4" opacity="0.45"/><rect x="476" y="92" width="6" height="8" fill="#D9AD70"/><rect x="474" y="86" width="10" height="2" fill="#8A93A3"/><rect x="475" y="90" width="2" height="6" fill="#FFFFFF" opacity="0.4"/><rect x="490" y="84" width="30" height="16" fill="#B08A5E"/><rect x="490" y="84" width="30" height="2" fill="#CFA676"/><rect x="500" y="88" width="10" height="6" fill="#E9DDC5"/><rect x="542" y="96" width="12" height="4" fill="#A77F4C"/><rect x="544" y="83" width="8" height="2" fill="#9B89D1"/><rect x="542" y="85" width="12" height="2" fill="#9B89D1"/><rect x="542" y="87" width="12" height="2" fill="#9B89D1"/><rect x="542" y="89" width="12" height="2" fill="#9B89D1"/><rect x="542" y="91" width="12" height="2" fill="#9B89D1"/><rect x="544" y="93" width="8" height="2" fill="#9B89D1"/><rect x="545" y="85" width="2" height="2" fill="#FFFFFF" opacity="0.8"/><rect x="560" y="86" width="12" height="14" fill="#A77F4C"/><rect x="562" y="88" width="8" height="10" fill="#3F5F8A"/><rect x="564" y="92" width="4" height="2" fill="#E9DDC5"/><rect x="392" y="114" width="8" height="26" fill="#3F5F8A"/><rect x="392" y="114" width="2" height="26" fill="#657FA1"/><rect x="394" y="120" width="4" height="6" fill="#E9DDC5" opacity="0.8"/><rect x="400" y="114" width="8" height="26" fill="#8E3B3B"/><rect x="400" y="114" width="2" height="26" fill="#A46262"/><rect x="402" y="120" width="4" height="6" fill="#E9DDC5" opacity="0.8"/><rect x="408" y="114" width="8" height="26" fill="#5A7A4A"/><rect x="408" y="114" width="2" height="26" fill="#7B946E"/><rect x="410" y="120" width="4" height="6" fill="#E9DDC5" opacity="0.8"/><rect x="416" y="114" width="8" height="26" fill="#6A4A7A"/><rect x="416" y="114" width="2" height="26" fill="#876E94"/><rect x="418" y="120" width="4" height="6" fill="#E9DDC5" opacity="0.8"/><rect x="424" y="114" width="8" height="26" fill="#3F5F8A"/><rect x="424" y="114" width="2" height="26" fill="#657FA1"/><rect x="426" y="120" width="4" height="6" fill="#E9DDC5" opacity="0.8"/><rect x="432" y="114" width="8" height="26" fill="#A2793C"/><rect x="432" y="114" width="2" height="26" fill="#B49363"/><rect x="434" y="120" width="4" height="6" fill="#E9DDC5" opacity="0.8"/><rect x="452" y="124" width="34" height="16" fill="#A07A52"/><rect x="452" y="122" width="34" height="4" fill="#C09668"/><rect x="462" y="128" width="14" height="6" fill="#E9DDC5"/><rect x="494" y="112" width="56" height="28" fill="#3D281B"/><rect x="494" y="112" width="56" height="2" fill="#7A5236"/><rect x="498" y="116" width="14" height="9" fill="#1C140F"/><rect x="500" y="119" width="10" height="4" fill="#E9DDC5"/><rect x="500" y="119" width="10" height="1" fill="#B9AB90"/><rect x="516" y="116" width="14" height="9" fill="#1C140F"/><rect x="534" y="116" width="14" height="9" fill="#1C140F"/><rect x="536" y="119" width="10" height="4" fill="#E9DDC5"/><rect x="536" y="119" width="10" height="1" fill="#B9AB90"/><rect x="498" y="128" width="14" height="9" fill="#1C140F"/><rect x="516" y="128" width="14" height="9" fill="#1C140F"/><rect x="518" y="131" width="10" height="4" fill="#E9DDC5"/><rect x="518" y="131" width="10" height="1" fill="#B9AB90"/><rect x="534" y="128" width="14" height="9" fill="#1C140F"/><rect x="558" y="128" width="10" height="12" fill="#E9DDC5"/><rect x="568" y="130" width="3" height="6" fill="#E9DDC5"/><rect x="558" y="128" width="10" height="2" fill="#FFF8E8"/><rect x="560" y="134" width="6" height="2" fill="#B5504A"/><rect x="334" y="178" width="292" height="92" fill="#1A1410"/><rect x="336" y="180" width="288" height="16" fill="#9A6B45"/><rect x="336" y="180" width="288" height="2" fill="#B5845A"/><rect x="336" y="196" width="288" height="4" fill="#C39A6A"/><rect x="336" y="200" width="288" height="2" fill="#3D281B"/><rect x="336" y="202" width="288" height="62" fill="#6B4630"/><rect x="336" y="204" width="288" height="2" fill="#A77F4C"/><rect x="344" y="210" width="62" height="46" fill="#5A3A27"/><rect x="344" y="210" width="62" height="2" fill="#3D281B"/><rect x="344" y="210" width="2" height="46" fill="#3D281B"/><rect x="344" y="254" width="62" height="2" fill="#7F573B"/><rect x="404" y="210" width="2" height="46" fill="#7F573B"/><rect x="414" y="210" width="62" height="46" fill="#5A3A27"/><rect x="414" y="210" width="62" height="2" fill="#3D281B"/><rect x="414" y="210" width="2" height="46" fill="#3D281B"/><rect x="414" y="254" width="62" height="2" fill="#7F573B"/><rect x="474" y="210" width="2" height="46" fill="#7F573B"/><rect x="484" y="210" width="62" height="46" fill="#5A3A27"/><rect x="484" y="210" width="62" height="2" fill="#3D281B"/><rect x="484" y="210" width="2" height="46" fill="#3D281B"/><rect x="484" y="254" width="62" height="2" fill="#7F573B"/><rect x="544" y="210" width="2" height="46" fill="#7F573B"/><rect x="554" y="210" width="62" height="46" fill="#5A3A27"/><rect x="554" y="210" width="62" height="2" fill="#3D281B"/><rect x="554" y="210" width="2" height="46" fill="#3D281B"/><rect x="554" y="254" width="62" height="2" fill="#7F573B"/><rect x="614" y="210" width="2" height="46" fill="#7F573B"/><rect x="470" y="224" width="20" height="18" fill="#A77F4C"/><rect x="472" y="226" width="16" height="14" fill="#D9AD70"/><rect x="476" y="228" width="8" height="12" fill="#3A2C22"/><rect x="478" y="226" width="4" height="2" fill="#D9AD70"/><rect x="479" y="230" width="2" height="8" fill="#C5B8F0"/><rect x="336" y="264" width="288" height="4" fill="#2B1F18"/><rect x="618" y="202" width="6" height="62" fill="#4D3322"/><rect x="358" y="190" width="16" height="4" fill="#3D4250"/><rect x="360" y="188" width="12" height="2" fill="#8A93A3"/><rect x="364" y="166" width="4" height="22" fill="#5D6573"/><rect x="364" y="166" width="2" height="22" fill="#8A93A3"/><polygon points="352,166 380,166 374,152 358,152" fill="#B88A4E"/><rect x="358" y="150" width="16" height="2" fill="#F0CF98"/><rect x="360" y="154" width="4" height="10" fill="#F0CF98"/><rect x="354" y="166" width="24" height="2" fill="#FFF2C8" class="lamp-glow"/><rect x="410" y="182" width="10" height="12" fill="#E9DDC5"/><rect x="409" y="180" width="12" height="3" fill="#8A93A3"/><rect x="410" y="186" width="10" height="4" fill="#7A5236"/><rect x="418" y="182" width="2" height="12" fill="#C9BBA2"/><rect x="426" y="192" width="20" height="2" fill="#5D4A2A"/><rect x="430" y="186" width="12" height="6" fill="#D9AD70"/><rect x="432" y="184" width="8" height="2" fill="#D9AD70"/><rect x="435" y="182" width="2" height="2" fill="#F0CF98"/><rect x="432" y="187" width="2" height="3" fill="#F0CF98"/><rect x="458" y="194" width="52" height="3" fill="#000" opacity="0.25"/><rect x="456" y="184" width="52" height="12" fill="#6A2F2F"/><rect x="458" y="182" width="23" height="12" fill="#E9DDC5"/><rect x="483" y="182" width="23" height="12" fill="#E9DDC5"/><rect x="480" y="182" width="3" height="12" fill="#B9AB90"/><rect x="461" y="185" width="17" height="1" fill="#9B8F78"/><rect x="486" y="185" width="16" height="1" fill="#9B8F78"/><rect x="461" y="188" width="17" height="1" fill="#9B8F78"/><rect x="486" y="188" width="16" height="1" fill="#9B8F78"/><rect x="461" y="191" width="17" height="1" fill="#9B8F78"/><rect x="486" y="191" width="16" height="1" fill="#9B8F78"/><rect x="494" y="194" width="2" height="6" fill="#B5504A"/><rect x="512" y="186" width="14" height="2" fill="#20252E"/><rect x="526" y="186" width="2" height="2" fill="#D9AD70"/><rect x="546" y="190" width="2" height="6" fill="#3D281B"/><rect x="570" y="190" width="2" height="6" fill="#3D281B"/><rect x="538" y="160" width="40" height="32" fill="#A77F4C"/><rect x="540" y="162" width="36" height="28" fill="#22303F"/><rect x="540" y="162" width="36" height="2" fill="#2E3F52"/><rect x="543" y="166" width="6" height="2" fill="#F0CF98"/><rect x="543" y="168" width="2" height="2" fill="#F0CF98"/><rect x="547" y="168" width="2" height="2" fill="#F0CF98"/><rect x="543" y="170" width="2" height="2" fill="#F0CF98"/><rect x="547" y="170" width="2" height="2" fill="#F0CF98"/><rect x="543" y="172" width="2" height="2" fill="#F0CF98"/><rect x="547" y="172" width="2" height="2" fill="#F0CF98"/><rect x="543" y="174" width="6" height="2" fill="#F0CF98"/><rect x="551" y="166" width="4" height="2" fill="#F0CF98"/><rect x="551" y="168" width="2" height="2" fill="#F0CF98"/><rect x="555" y="168" width="2" height="2" fill="#F0CF98"/><rect x="551" y="170" width="4" height="2" fill="#F0CF98"/><rect x="551" y="172" width="2" height="2" fill="#F0CF98"/><rect x="551" y="174" width="2" height="2" fill="#F0CF98"/><rect x="559" y="166" width="6" height="2" fill="#F0CF98"/><rect x="559" y="168" width="2" height="2" fill="#F0CF98"/><rect x="559" y="170" width="4" height="2" fill="#F0CF98"/><rect x="559" y="172" width="2" height="2" fill="#F0CF98"/><rect x="559" y="174" width="6" height="2" fill="#F0CF98"/><rect x="567" y="166" width="4" height="2" fill="#F0CF98"/><rect x="567" y="168" width="2" height="2" fill="#F0CF98"/><rect x="571" y="168" width="2" height="2" fill="#F0CF98"/><rect x="567" y="170" width="2" height="2" fill="#F0CF98"/><rect x="571" y="170" width="2" height="2" fill="#F0CF98"/><rect x="567" y="172" width="2" height="2" fill="#F0CF98"/><rect x="571" y="172" width="2" height="2" fill="#F0CF98"/><rect x="567" y="174" width="2" height="2" fill="#F0CF98"/><rect x="571" y="174" width="2" height="2" fill="#F0CF98"/><rect x="547" y="178" width="4" height="2" fill="#8FB6A6"/><rect x="551" y="180" width="2" height="2" fill="#8FB6A6"/><rect x="549" y="182" width="2" height="2" fill="#8FB6A6"/><rect x="547" y="184" width="2" height="2" fill="#8FB6A6"/><rect x="547" y="186" width="6" height="2" fill="#8FB6A6"/><rect x="555" y="178" width="2" height="2" fill="#8FB6A6"/><rect x="559" y="178" width="2" height="2" fill="#8FB6A6"/><rect x="555" y="180" width="2" height="2" fill="#8FB6A6"/><rect x="559" y="180" width="2" height="2" fill="#8FB6A6"/><rect x="555" y="182" width="6" height="2" fill="#8FB6A6"/><rect x="559" y="184" width="2" height="2" fill="#8FB6A6"/><rect x="559" y="186" width="2" height="2" fill="#8FB6A6"/><rect x="563" y="178" width="2" height="2" fill="#8FB6A6"/><rect x="567" y="178" width="2" height="2" fill="#8FB6A6"/><rect x="563" y="180" width="2" height="2" fill="#8FB6A6"/><rect x="567" y="180" width="2" height="2" fill="#8FB6A6"/><rect x="563" y="182" width="6" height="2" fill="#8FB6A6"/><rect x="563" y="184" width="2" height="2" fill="#8FB6A6"/><rect x="567" y="184" width="2" height="2" fill="#8FB6A6"/><rect x="563" y="186" width="2" height="2" fill="#8FB6A6"/><rect x="567" y="186" width="2" height="2" fill="#8FB6A6"/><rect x="592" y="188" width="14" height="10" fill="#A8714B"/><rect x="590" y="186" width="18" height="3" fill="#C08A5E"/><rect x="596" y="172" width="6" height="14" fill="#5A8A64"/><rect x="592" y="176" width="4" height="6" fill="#5A8A64"/><rect x="602" y="178" width="4" height="6" fill="#4C7A58"/><rect x="597" y="174" width="2" height="10" fill="#7AA67A"/><rect x="598" y="170" width="2" height="2" fill="#E8A0A0"/></g><rect class="hit" x="340" y="40" width="282" height="236" fill="transparent"/></g>
+<g class="hot" id="hot-F" data-panel="F" tabindex="0" role="button" aria-label="電梯：開啟作品分類"><g class="art"><rect x="646" y="34" width="132" height="210" fill="#1A202B"/><rect x="648" y="36" width="128" height="208" fill="#4A5568"/><rect x="648" y="36" width="128" height="2" fill="#6B778C"/><rect x="648" y="36" width="2" height="208" fill="#6B778C"/><rect x="774" y="36" width="2" height="208" fill="#2E3644"/><rect x="656" y="72" width="2" height="168" fill="#3A4352"/><rect x="764" y="72" width="2" height="168" fill="#3A4352"/><rect x="652" y="72" width="2" height="168" fill="#59647A"/><rect x="656" y="40" width="112" height="24" fill="#2B3240"/><rect x="668" y="44" width="88" height="16" fill="#10141C"/><rect x="674" y="47" width="6" height="2" fill="#C5B8F0"/><rect x="674" y="49" width="2" height="2" fill="#C5B8F0"/><rect x="678" y="49" width="2" height="2" fill="#C5B8F0"/><rect x="674" y="51" width="2" height="2" fill="#C5B8F0"/><rect x="678" y="51" width="2" height="2" fill="#C5B8F0"/><rect x="674" y="53" width="2" height="2" fill="#C5B8F0"/><rect x="678" y="53" width="2" height="2" fill="#C5B8F0"/><rect x="674" y="55" width="6" height="2" fill="#C5B8F0"/><rect x="682" y="47" width="6" height="2" fill="#C5B8F0"/><rect x="686" y="49" width="2" height="2" fill="#C5B8F0"/><rect x="684" y="51" width="2" height="2" fill="#C5B8F0"/><rect x="684" y="53" width="2" height="2" fill="#C5B8F0"/><rect x="684" y="55" width="2" height="2" fill="#C5B8F0"/><rect x="698" y="50" width="6" height="4" fill="#3A3F52" class="ind"/><rect x="708" y="50" width="6" height="4" fill="#3A3F52" class="ind"/><rect x="718" y="50" width="6" height="4" fill="#C5B8F0" class="ind ind-on"/><rect x="728" y="50" width="6" height="4" fill="#3A3F52" class="ind"/><rect x="738" y="50" width="6" height="4" fill="#3A3F52" class="ind"/><rect x="700" y="64" width="24" height="4" fill="#A77F4C"/><rect x="702" y="64" width="20" height="2" fill="#D9AD70"/><rect x="666" y="66" width="92" height="178" fill="#1A202B"/><rect x="668" y="68" width="44" height="176" fill="#7D8696"/><rect x="712" y="68" width="44" height="176" fill="#7D8696"/><rect x="670" y="70" width="4" height="172" fill="#A3ABB8"/><rect x="714" y="70" width="4" height="172" fill="#A3ABB8"/><rect x="706" y="68" width="4" height="176" fill="#5D6573"/><rect x="750" y="68" width="4" height="176" fill="#5D6573"/><rect x="676" y="92" width="28" height="64" fill="#6F7888"/><rect x="676" y="92" width="28" height="2" fill="#5D6573"/><rect x="676" y="154" width="28" height="2" fill="#9AA2AF"/><rect x="676" y="168" width="28" height="64" fill="#6F7888"/><rect x="676" y="168" width="28" height="2" fill="#5D6573"/><rect x="676" y="230" width="28" height="2" fill="#9AA2AF"/><rect x="688" y="118" width="4" height="2" fill="#6D5EA3"/><rect x="686" y="120" width="8" height="2" fill="#6D5EA3"/><rect x="688" y="122" width="4" height="2" fill="#6D5EA3"/><rect x="720" y="92" width="28" height="64" fill="#6F7888"/><rect x="720" y="92" width="28" height="2" fill="#5D6573"/><rect x="720" y="154" width="28" height="2" fill="#9AA2AF"/><rect x="720" y="168" width="28" height="64" fill="#6F7888"/><rect x="720" y="168" width="28" height="2" fill="#5D6573"/><rect x="720" y="230" width="28" height="2" fill="#9AA2AF"/><rect x="732" y="118" width="4" height="2" fill="#6D5EA3"/><rect x="730" y="120" width="8" height="2" fill="#6D5EA3"/><rect x="732" y="122" width="4" height="2" fill="#6D5EA3"/><rect x="710" y="68" width="4" height="176" fill="#2A2140"/><rect x="711" y="72" width="2" height="168" fill="#C5B8F0" class="seam-glow"/><rect x="664" y="240" width="96" height="4" fill="#8A93A3"/><rect x="664" y="244" width="96" height="4" fill="#5D6573"/><rect x="780" y="130" width="20" height="52" fill="#1A202B"/><rect x="782" y="132" width="16" height="48" fill="#8A93A3"/><rect x="782" y="132" width="2" height="48" fill="#B8C0CC"/><rect x="787" y="140" width="6" height="6" fill="#D9AD70"/><rect x="788" y="141" width="2" height="2" fill="#F0CF98"/><rect x="787" y="154" width="6" height="6" fill="#5D6573"/><rect x="787" y="168" width="6" height="6" fill="#9B89D1" class="odd-btn"/><rect x="784" y="134" width="2" height="2" fill="#5D6573"/><rect x="794" y="176" width="2" height="2" fill="#5D6573"/></g><rect class="hit" x="646" y="34" width="156" height="210" fill="transparent"/></g>
+<g class="hot" id="hot-C" data-panel="C" tabindex="0" role="button" aria-label="公告欄：開啟近期更新"><g class="art"><rect x="812" y="60" width="132" height="108" fill="#000" opacity="0.3"/><rect x="806" y="54" width="134" height="110" fill="#1A1410"/><rect x="808" y="56" width="130" height="106" fill="#7A5236"/><rect x="808" y="56" width="130" height="2" fill="#9A6B45"/><rect x="808" y="160" width="130" height="2" fill="#3D281B"/><rect x="816" y="64" width="114" height="90" fill="url(#cork)"/><rect x="816" y="64" width="114" height="2" fill="#000" opacity="0.3"/><rect x="816" y="64" width="2" height="90" fill="#000" opacity="0.2"/><rect x="824" y="72" width="34" height="40" fill="#000" opacity="0.25"/><rect x="822" y="70" width="34" height="40" fill="#E9DDC5"/><rect x="826" y="74" width="26" height="4" fill="#B5504A"/><rect x="826" y="82" width="26" height="2" fill="#B9AB90"/><rect x="826" y="88" width="26" height="2" fill="#B9AB90"/><rect x="826" y="94" width="26" height="2" fill="#B9AB90"/><rect x="826" y="100" width="18" height="2" fill="#B9AB90"/><rect x="837" y="68" width="4" height="4" fill="#D8746A"/><rect x="864" y="70" width="28" height="28" fill="#000" opacity="0.2"/><rect x="862" y="68" width="28" height="28" fill="#A9CBBD"/><rect x="862" y="68" width="28" height="4" fill="#8FB6A6"/><rect x="866" y="76" width="18" height="2" fill="#4A6B60"/><rect x="866" y="82" width="20" height="2" fill="#4A6B60"/><rect x="866" y="88" width="12" height="2" fill="#4A6B60"/><rect x="874" y="66" width="4" height="4" fill="#D9AD70"/><rect x="898" y="74" width="30" height="40" fill="#000" opacity="0.25"/><rect x="896" y="72" width="30" height="40" fill="#C5B8F0"/><rect x="898" y="74" width="26" height="14" fill="#6D5EA3"/><rect x="900" y="76" width="4" height="2" fill="#E9DDC5"/><rect x="900" y="78" width="2" height="2" fill="#E9DDC5"/><rect x="904" y="78" width="2" height="2" fill="#E9DDC5"/><rect x="900" y="80" width="2" height="2" fill="#E9DDC5"/><rect x="904" y="80" width="2" height="2" fill="#E9DDC5"/><rect x="900" y="82" width="2" height="2" fill="#E9DDC5"/><rect x="904" y="82" width="2" height="2" fill="#E9DDC5"/><rect x="900" y="84" width="2" height="2" fill="#E9DDC5"/><rect x="904" y="84" width="2" height="2" fill="#E9DDC5"/><rect x="908" y="76" width="6" height="2" fill="#E9DDC5"/><rect x="908" y="78" width="2" height="2" fill="#E9DDC5"/><rect x="908" y="80" width="4" height="2" fill="#E9DDC5"/><rect x="908" y="82" width="2" height="2" fill="#E9DDC5"/><rect x="908" y="84" width="6" height="2" fill="#E9DDC5"/><rect x="916" y="76" width="2" height="2" fill="#E9DDC5"/><rect x="920" y="76" width="2" height="2" fill="#E9DDC5"/><rect x="916" y="78" width="2" height="2" fill="#E9DDC5"/><rect x="920" y="78" width="2" height="2" fill="#E9DDC5"/><rect x="916" y="80" width="2" height="2" fill="#E9DDC5"/><rect x="920" y="80" width="2" height="2" fill="#E9DDC5"/><rect x="916" y="82" width="6" height="2" fill="#E9DDC5"/><rect x="916" y="84" width="2" height="2" fill="#E9DDC5"/><rect x="920" y="84" width="2" height="2" fill="#E9DDC5"/><rect x="900" y="94" width="22" height="2" fill="#6D5EA3"/><rect x="900" y="100" width="22" height="2" fill="#6D5EA3"/><rect x="900" y="106" width="14" height="2" fill="#6D5EA3"/><rect x="909" y="70" width="4" height="4" fill="#D8746A"/><rect x="866" y="106" width="28" height="34" fill="#000" opacity="0.25"/><rect x="864" y="104" width="28" height="34" fill="#E9DDC5"/><rect x="867" y="107" width="22" height="22" fill="#24305A"/><rect x="867" y="123" width="22" height="6" fill="#22302F"/><rect x="878" y="110" width="6" height="6" fill="#E9DDC5"/><rect x="869" y="132" width="14" height="2" fill="#9B8F78"/><rect x="876" y="102" width="4" height="4" fill="#D9AD70"/><rect x="826" y="120" width="24" height="26" fill="#000" opacity="0.2"/><rect x="824" y="118" width="24" height="26" fill="#E8CF8A"/><rect x="828" y="124" width="16" height="2" fill="#8A6B3A"/><rect x="828" y="130" width="16" height="2" fill="#8A6B3A"/><rect x="828" y="136" width="10" height="2" fill="#8A6B3A"/><rect x="834" y="116" width="4" height="4" fill="#71998A"/><rect x="902" y="122" width="28" height="26" fill="#000" opacity="0.2"/><rect x="900" y="120" width="28" height="26" fill="#D9AD70"/><rect x="900" y="120" width="28" height="2" fill="#F0CF98"/><rect x="918" y="120" width="2" height="26" fill="#A77F4C"/><rect x="918" y="124" width="2" height="3" fill="#E9C98F"/><rect x="918" y="130" width="2" height="3" fill="#E9C98F"/><rect x="918" y="136" width="2" height="3" fill="#E9C98F"/><rect x="918" y="142" width="2" height="3" fill="#E9C98F"/><rect x="904" y="128" width="10" height="2" fill="#3D281B"/><rect x="904" y="134" width="8" height="2" fill="#3D281B"/><rect x="912" y="118" width="4" height="4" fill="#D8746A"/></g><rect class="hit" x="806" y="54" width="136" height="110" fill="transparent"/></g>
+<g aria-hidden="true">
+<ellipse cx="796" cy="257" rx="16" ry="4" fill="#000" opacity="0.32"/><rect x="782" y="214" width="8" height="2" fill="#4C7A58"/><rect x="780" y="216" width="12" height="2" fill="#4C7A58"/><rect x="778" y="218" width="16" height="2" fill="#4C7A58"/><rect x="778" y="220" width="16" height="2" fill="#4C7A58"/><rect x="778" y="222" width="16" height="2" fill="#4C7A58"/><rect x="778" y="224" width="16" height="2" fill="#4C7A58"/><rect x="780" y="226" width="12" height="2" fill="#4C7A58"/><rect x="782" y="228" width="8" height="2" fill="#4C7A58"/><rect x="798" y="212" width="8" height="2" fill="#3F6B4F"/><rect x="796" y="214" width="12" height="2" fill="#3F6B4F"/><rect x="794" y="216" width="16" height="2" fill="#3F6B4F"/><rect x="794" y="218" width="16" height="2" fill="#3F6B4F"/><rect x="794" y="220" width="16" height="2" fill="#3F6B4F"/><rect x="794" y="222" width="16" height="2" fill="#3F6B4F"/><rect x="796" y="224" width="12" height="2" fill="#3F6B4F"/><rect x="798" y="226" width="8" height="2" fill="#3F6B4F"/><rect x="790" y="201" width="8" height="2" fill="#5A8A64"/><rect x="788" y="203" width="12" height="2" fill="#5A8A64"/><rect x="786" y="205" width="16" height="2" fill="#5A8A64"/><rect x="786" y="207" width="16" height="2" fill="#5A8A64"/><rect x="786" y="209" width="16" height="2" fill="#5A8A64"/><rect x="786" y="211" width="16" height="2" fill="#5A8A64"/><rect x="786" y="213" width="16" height="2" fill="#5A8A64"/><rect x="788" y="215" width="12" height="2" fill="#5A8A64"/><rect x="790" y="217" width="8" height="2" fill="#5A8A64"/><rect x="786" y="221" width="8" height="2" fill="#5A8A64"/><rect x="784" y="223" width="12" height="2" fill="#5A8A64"/><rect x="784" y="225" width="12" height="2" fill="#5A8A64"/><rect x="782" y="227" width="16" height="2" fill="#5A8A64"/><rect x="784" y="229" width="12" height="2" fill="#5A8A64"/><rect x="784" y="231" width="12" height="2" fill="#5A8A64"/><rect x="786" y="233" width="8" height="2" fill="#5A8A64"/><rect x="796" y="224" width="8" height="2" fill="#4C7A58"/><rect x="794" y="226" width="12" height="2" fill="#4C7A58"/><rect x="794" y="228" width="12" height="2" fill="#4C7A58"/><rect x="794" y="230" width="12" height="2" fill="#4C7A58"/><rect x="794" y="232" width="12" height="2" fill="#4C7A58"/><rect x="796" y="234" width="8" height="2" fill="#4C7A58"/><rect x="792" y="204" width="4" height="2" fill="#7AA67A"/><rect x="784" y="218" width="4" height="2" fill="#7AA67A"/><rect x="800" y="216" width="4" height="2" fill="#7AA67A"/><rect x="784" y="236" width="20" height="20" fill="#71998A"/><rect x="782" y="234" width="24" height="4" fill="#8FB6A6"/><rect x="798" y="238" width="6" height="18" fill="#557A6D"/><rect x="784" y="252" width="20" height="4" fill="#3F5D52"/>
+<rect x="852" y="330" width="82" height="6" fill="#000" opacity="0.3"/><rect x="854" y="280" width="76" height="54" fill="#1A1410"/><rect x="856" y="282" width="72" height="10" fill="#C09668"/><rect x="856" y="292" width="72" height="40" fill="#A07A52"/><rect x="856" y="292" width="72" height="2" fill="#7F5F3E"/><rect x="856" y="326" width="72" height="6" fill="#7F5F3E"/><rect x="888" y="282" width="8" height="10" fill="#D8C39A"/><rect x="888" y="292" width="8" height="12" fill="#D8C39A"/><rect x="864" y="304" width="16" height="10" fill="#E9DDC5"/><rect x="866" y="307" width="12" height="1" fill="#9B8F78"/><rect x="866" y="310" width="8" height="1" fill="#9B8F78"/><rect x="910" y="300" width="4" height="6" fill="#3D281B"/><rect x="908" y="302" width="8" height="2" fill="#3D281B"/><rect x="864" y="256" width="52" height="34" fill="#1A1410"/><rect x="866" y="258" width="48" height="8" fill="#CFA676"/><rect x="866" y="266" width="48" height="22" fill="#B08A5E"/><rect x="866" y="266" width="48" height="2" fill="#8F6D47"/><rect x="886" y="258" width="8" height="8" fill="#E2D0A8"/><rect x="866" y="284" width="48" height="4" fill="#8F6D47"/><polygon points="866,258 856,250 864,248 872,258" fill="#D8B888"/>
+<rect x="898" y="446" width="40" height="4" fill="#000" opacity="0.3"/><rect x="906" y="380" width="4" height="40" fill="#3F5F8A"/><polygon points="902,380 914,380 908,372" fill="#3F5F8A"/><rect x="907" y="368" width="2" height="4" fill="#8A93A3"/><rect x="918" y="372" width="4" height="48" fill="#B5504A"/><polygon points="914,376 926,376 920,366" fill="#B5504A"/><rect x="918" y="362" width="6" height="2" fill="#3D281B"/><rect x="922" y="362" width="2" height="6" fill="#3D281B"/><rect x="898" y="410" width="36" height="38" fill="#1A1D24"/><rect x="900" y="412" width="32" height="34" fill="#5D6573"/><rect x="900" y="412" width="32" height="4" fill="#8A93A3"/><rect x="902" y="416" width="4" height="28" fill="#8A93A3"/><rect x="926" y="416" width="4" height="28" fill="#454C58"/><rect x="900" y="428" width="32" height="2" fill="#454C58"/>
+</g>
+<g class="hot" id="hot-D" data-panel="D" tabindex="0" role="button" aria-label="沙發休息區：開啟精選推薦"><g class="art"><rect x="30" y="436" width="24" height="6" fill="#2B2F3A"/><rect x="32" y="434" width="20" height="2" fill="#4A5060"/><rect x="40" y="300" width="4" height="134" fill="#4A5060"/><rect x="40" y="300" width="2" height="134" fill="#7A8296"/><polygon points="24,302 60,302 54,276 30,276" fill="#C79A5C"/><rect x="30" y="274" width="24" height="2" fill="#F0CF98"/><rect x="34" y="280" width="4" height="18" fill="#F0CF98"/><rect x="26" y="302" width="32" height="2" fill="#FFF2C8" class="lamp-glow"/><rect x="62" y="342" width="172" height="96" fill="#1C2622"/><rect x="80" y="344" width="136" height="8" fill="#7FA595"/><rect x="80" y="352" width="136" height="36" fill="#5F8778"/><rect x="80" y="384" width="136" height="4" fill="#476A5D"/><rect x="148" y="352" width="2" height="32" fill="#476A5D"/><rect x="96" y="366" width="2" height="2" fill="#344F45"/><rect x="120" y="366" width="2" height="2" fill="#344F45"/><rect x="144" y="366" width="2" height="2" fill="#344F45"/><rect x="168" y="366" width="2" height="2" fill="#344F45"/><rect x="192" y="366" width="2" height="2" fill="#344F45"/><rect x="64" y="364" width="20" height="8" fill="#7FA595"/><rect x="64" y="372" width="20" height="60" fill="#5F8778"/><rect x="80" y="372" width="4" height="60" fill="#476A5D"/><rect x="66" y="374" width="2" height="56" fill="#7FA595"/><rect x="212" y="364" width="20" height="8" fill="#7FA595"/><rect x="212" y="372" width="20" height="60" fill="#5F8778"/><rect x="212" y="372" width="4" height="60" fill="#476A5D"/><rect x="84" y="388" width="62" height="24" fill="#6F9686"/><rect x="150" y="388" width="62" height="24" fill="#6F9686"/><rect x="146" y="388" width="4" height="24" fill="#476A5D"/><rect x="84" y="410" width="128" height="2" fill="#476A5D"/><rect x="84" y="412" width="128" height="20" fill="#5F8778"/><rect x="84" y="412" width="128" height="2" fill="#7FA595"/><rect x="84" y="428" width="128" height="4" fill="#476A5D"/><rect x="66" y="432" width="164" height="4" fill="#344F45"/><rect x="72" y="436" width="6" height="4" fill="#3D281B"/><rect x="218" y="436" width="6" height="4" fill="#3D281B"/><rect x="92" y="374" width="24" height="18" fill="#9B89D1"/><rect x="94" y="376" width="20" height="2" fill="#C5B8F0"/><rect x="92" y="388" width="24" height="4" fill="#6D5EA3"/><rect x="92" y="374" width="2" height="2" fill="#5F8778"/><rect x="114" y="374" width="2" height="2" fill="#5F8778"/><rect x="206" y="366" width="30" height="12" fill="#D9CBB0"/><rect x="206" y="370" width="30" height="2" fill="#B5504A"/><rect x="226" y="378" width="10" height="26" fill="#D9CBB0"/><rect x="226" y="386" width="10" height="2" fill="#B5504A"/><rect x="226" y="396" width="10" height="2" fill="#B5504A"/><rect x="234" y="378" width="2" height="26" fill="#B9AB90"/><rect x="168" y="394" width="18" height="8" fill="#6A2F2F"/><rect x="169" y="393" width="8" height="7" fill="#E9DDC5"/><rect x="178" y="393" width="7" height="7" fill="#E9DDC5"/><rect x="176" y="393" width="2" height="8" fill="#B9AB90"/><rect x="102" y="454" width="104" height="34" fill="#2A1C14"/><rect x="104" y="456" width="100" height="24" fill="#8A5E3C"/><rect x="104" y="456" width="100" height="2" fill="#A8714B"/><rect x="104" y="480" width="100" height="6" fill="#5A3A27"/><rect x="108" y="486" width="6" height="10" fill="#3D281B"/><rect x="194" y="486" width="6" height="10" fill="#3D281B"/><rect x="114" y="470" width="18" height="4" fill="#E9DDC5"/><rect x="116" y="474" width="14" height="2" fill="#B9AB90"/><rect x="117" y="462" width="12" height="8" fill="#E9DDC5"/><rect x="117" y="462" width="12" height="2" fill="#FFF8E8"/><rect x="119" y="462" width="8" height="2" fill="#6B4630"/><rect x="129" y="464" width="3" height="4" fill="#E9DDC5"/><rect x="176" y="470" width="18" height="4" fill="#E9DDC5"/><rect x="178" y="474" width="14" height="2" fill="#B9AB90"/><rect x="179" y="462" width="12" height="8" fill="#E9DDC5"/><rect x="179" y="462" width="12" height="2" fill="#FFF8E8"/><rect x="181" y="462" width="8" height="2" fill="#8F6D2E"/><rect x="191" y="464" width="3" height="4" fill="#E9DDC5"/><rect x="144" y="458" width="20" height="14" fill="#71998A"/><rect x="144" y="458" width="20" height="2" fill="#8FB6A6"/><rect x="148" y="454" width="12" height="4" fill="#8FB6A6"/><rect x="152" y="452" width="4" height="2" fill="#D9AD70"/><rect x="164" y="462" width="6" height="3" fill="#71998A"/><rect x="138" y="460" width="6" height="8" fill="#557A6D"/><rect x="160" y="460" width="4" height="12" fill="#557A6D"/><rect x="121" y="452" width="2" height="4" fill="#FFFFFF" opacity="0.35" class="steam"/><rect x="124" y="446" width="2" height="4" fill="#FFFFFF" opacity="0.25" class="steam s2"/><rect x="118" y="548" width="72" height="6" fill="#000" opacity="0.3"/><rect x="114" y="498" width="76" height="50" fill="#22140F"/><rect x="124" y="500" width="56" height="6" fill="#9A6250"/><rect x="124" y="506" width="56" height="32" fill="#7A4A3A"/><rect x="124" y="520" width="56" height="2" fill="#5A3428"/><rect x="126" y="506" width="2" height="30" fill="#9A6250"/><rect x="116" y="508" width="10" height="4" fill="#9A6250"/><rect x="116" y="512" width="10" height="34" fill="#5A3428"/><rect x="178" y="508" width="10" height="4" fill="#9A6250"/><rect x="178" y="512" width="10" height="34" fill="#5A3428"/><rect x="120" y="538" width="64" height="8" fill="#5A3428"/><rect x="124" y="546" width="6" height="4" fill="#3D281B"/><rect x="174" y="546" width="6" height="4" fill="#3D281B"/><rect x="256" y="504" width="44" height="4" fill="#000" opacity="0.3"/><rect x="258" y="494" width="38" height="10" fill="#3F5F8A"/><rect x="258" y="494" width="38" height="2" fill="#5F7FAA"/><rect x="290" y="496" width="4" height="6" fill="#E9DDC5"/><rect x="262" y="484" width="30" height="10" fill="#8E3B3B"/><rect x="262" y="484" width="30" height="2" fill="#AE5B5B"/><rect x="286" y="486" width="4" height="6" fill="#E9DDC5"/><rect x="256" y="476" width="32" height="8" fill="#5A7A4A"/><rect x="256" y="476" width="32" height="2" fill="#7A9A6A"/><rect x="282" y="478" width="4" height="4" fill="#E9DDC5"/><rect x="304" y="494" width="12" height="12" fill="#A77F4C"/><rect x="304" y="494" width="12" height="2" fill="#D9AD70"/><rect x="316" y="497" width="3" height="6" fill="#A77F4C"/><rect x="306" y="495" width="8" height="1" fill="#3D281B"/></g><rect class="hit" x="22" y="272" width="302" height="284" fill="transparent"/></g>
+<g class="hot" id="hot-E" data-panel="E" tabindex="0" role="button" aria-label="資料終端機：開啟世界觀資料庫"><g class="art"><rect x="396" y="528" width="176" height="6" fill="#000" opacity="0.3"/><rect x="390" y="446" width="180" height="38" fill="#141820"/><rect x="392" y="448" width="176" height="20" fill="#3F4A5A"/><rect x="392" y="448" width="176" height="2" fill="#566275"/><rect x="392" y="468" width="176" height="14" fill="#2F3846"/><rect x="500" y="471" width="40" height="8" fill="#262E3A"/><rect x="516" y="474" width="8" height="2" fill="#D9AD70"/><rect x="396" y="482" width="8" height="46" fill="#252C38"/><rect x="556" y="482" width="8" height="46" fill="#252C38"/><rect x="396" y="482" width="2" height="46" fill="#3A4454"/><rect x="404" y="516" width="152" height="4" fill="#252C38"/><rect x="560" y="452" width="2" height="28" fill="#141820"/><rect x="566" y="482" width="2" height="40" fill="#141820"/><rect x="566" y="520" width="18" height="2" fill="#141820"/><rect x="418" y="364" width="108" height="86" fill="#1A1D24"/><rect x="424" y="366" width="96" height="8" fill="#C9C0AB"/><rect x="420" y="374" width="104" height="74" fill="#B3A990"/><rect x="420" y="374" width="2" height="74" fill="#D8CFB8"/><rect x="518" y="374" width="6" height="74" fill="#8F866F"/><rect x="420" y="438" width="104" height="10" fill="#A39A80"/><rect x="500" y="441" width="6" height="4" fill="#5D5544"/><rect x="510" y="442" width="4" height="2" fill="#71998A" class="led"/><rect x="428" y="380" width="88" height="56" fill="#3D3A33"/><rect x="432" y="384" width="80" height="50" fill="#0F2A26"/><g class="screen"><rect x="436" y="388" width="40" height="2" fill="#71998A"/><rect x="436" y="394" width="56" height="2" fill="#71998A"/><rect x="436" y="400" width="28" height="2" fill="#8FB6A6"/><rect x="436" y="406" width="48" height="2" fill="#C5B8F0"/><rect x="436" y="412" width="36" height="2" fill="#71998A"/><rect x="436" y="420" width="4" height="4" fill="#8FB6A6"/><rect x="442" y="420" width="6" height="4" fill="#C5B8F0" class="cursor"/><rect x="492" y="396" width="8" height="2" fill="#2F6B6B"/><rect x="490" y="398" width="12" height="2" fill="#2F6B6B"/><rect x="488" y="400" width="16" height="2" fill="#2F6B6B"/><rect x="488" y="402" width="16" height="2" fill="#2F6B6B"/><rect x="488" y="404" width="16" height="2" fill="#2F6B6B"/><rect x="488" y="406" width="16" height="2" fill="#2F6B6B"/><rect x="490" y="408" width="12" height="2" fill="#2F6B6B"/><rect x="492" y="410" width="8" height="2" fill="#2F6B6B"/><rect x="490" y="400" width="4" height="4" fill="#4C9A8A"/><rect x="496" y="406" width="6" height="2" fill="#4C9A8A"/><rect x="484" y="404" width="26" height="2" fill="#9B89D1"/><rect x="432" y="384" width="80" height="50" fill="url(#scan)"/></g><rect x="434" y="386" width="10" height="2" fill="#FFFFFF" opacity="0.22"/><rect x="434" y="386" width="2" height="10" fill="#FFFFFF" opacity="0.22"/><rect x="460" y="448" width="24" height="4" fill="#8F866F"/><rect x="426" y="452" width="92" height="14" fill="#1A1D24"/><rect x="428" y="454" width="88" height="10" fill="#C9C0AB"/><rect x="430" y="456" width="4" height="2" fill="#8F866F"/><rect x="436" y="456" width="4" height="2" fill="#8F866F"/><rect x="442" y="456" width="4" height="2" fill="#8F866F"/><rect x="448" y="456" width="4" height="2" fill="#8F866F"/><rect x="454" y="456" width="4" height="2" fill="#8F866F"/><rect x="460" y="456" width="4" height="2" fill="#8F866F"/><rect x="466" y="456" width="4" height="2" fill="#8F866F"/><rect x="472" y="456" width="4" height="2" fill="#8F866F"/><rect x="478" y="456" width="4" height="2" fill="#8F866F"/><rect x="484" y="456" width="4" height="2" fill="#8F866F"/><rect x="490" y="456" width="4" height="2" fill="#8F866F"/><rect x="496" y="456" width="4" height="2" fill="#8F866F"/><rect x="502" y="456" width="4" height="2" fill="#8F866F"/><rect x="508" y="456" width="4" height="2" fill="#8F866F"/><rect x="430" y="460" width="4" height="2" fill="#8F866F"/><rect x="436" y="460" width="4" height="2" fill="#8F866F"/><rect x="442" y="460" width="4" height="2" fill="#8F866F"/><rect x="448" y="460" width="4" height="2" fill="#8F866F"/><rect x="454" y="460" width="4" height="2" fill="#8F866F"/><rect x="460" y="460" width="4" height="2" fill="#8F866F"/><rect x="466" y="460" width="4" height="2" fill="#8F866F"/><rect x="472" y="460" width="4" height="2" fill="#8F866F"/><rect x="478" y="460" width="4" height="2" fill="#8F866F"/><rect x="484" y="460" width="4" height="2" fill="#8F866F"/><rect x="490" y="460" width="4" height="2" fill="#8F866F"/><rect x="496" y="460" width="4" height="2" fill="#8F866F"/><rect x="502" y="460" width="4" height="2" fill="#8F866F"/><rect x="508" y="460" width="4" height="2" fill="#8F866F"/><rect x="530" y="382" width="34" height="68" fill="#1A1D24"/><rect x="532" y="384" width="30" height="6" fill="#C9C0AB"/><rect x="532" y="390" width="30" height="58" fill="#B3A990"/><rect x="556" y="390" width="6" height="58" fill="#8F866F"/><rect x="536" y="398" width="18" height="4" fill="#3D3A33"/><rect x="536" y="406" width="18" height="4" fill="#3D3A33"/><rect x="536" y="416" width="18" height="2" fill="#8F866F"/><rect x="536" y="420" width="18" height="2" fill="#8F866F"/><rect x="536" y="424" width="18" height="2" fill="#8F866F"/><rect x="536" y="428" width="18" height="2" fill="#8F866F"/><rect x="538" y="436" width="4" height="2" fill="#9B89D1" class="led2"/><rect x="546" y="434" width="8" height="6" fill="#A39A80"/><rect x="540" y="382" width="14" height="2" fill="#A77F4C"/><polygon points="547,364 553,372 551,382 543,382 541,372" fill="#9B89D1"/><polygon points="547,364 548,372 545,382 543,382 541,372" fill="#C5B8F0"/><rect x="456" y="538" width="32" height="4" fill="#000" opacity="0.3"/><rect x="460" y="530" width="24" height="4" fill="#3D4250"/><rect x="470" y="512" width="4" height="20" fill="#5D6573"/><rect x="456" y="504" width="32" height="8" fill="#1C2622"/><rect x="458" y="500" width="28" height="8" fill="#71998A"/><rect x="458" y="500" width="28" height="2" fill="#8FB6A6"/><rect x="456" y="506" width="32" height="6" fill="#557A6D"/></g><rect class="hit" x="388" y="360" width="184" height="182" fill="transparent"/></g>
+<g class="hot" id="hot-G" data-panel="G" tabindex="0" role="button" aria-label="扭蛋機：開啟隨機推薦"><g class="art"><rect x="752" y="544" width="80" height="8" fill="#000" opacity="0.3"/><rect x="754" y="456" width="72" height="90" fill="#1A1D24"/><rect x="756" y="458" width="68" height="8" fill="#D8746A"/><rect x="756" y="466" width="68" height="74" fill="#B5504A"/><rect x="756" y="466" width="2" height="74" fill="#D8746A"/><rect x="818" y="466" width="6" height="74" fill="#82362F"/><rect x="754" y="540" width="72" height="6" fill="#5A2622"/><rect x="764" y="470" width="52" height="16" fill="#1C1414"/><rect x="773" y="473" width="4" height="2" fill="#F0CF98"/><rect x="771" y="475" width="2" height="2" fill="#F0CF98"/><rect x="771" y="477" width="2" height="2" fill="#F0CF98"/><rect x="775" y="477" width="2" height="2" fill="#F0CF98"/><rect x="771" y="479" width="2" height="2" fill="#F0CF98"/><rect x="775" y="479" width="2" height="2" fill="#F0CF98"/><rect x="773" y="481" width="4" height="2" fill="#F0CF98"/><rect x="781" y="473" width="2" height="2" fill="#F0CF98"/><rect x="779" y="475" width="2" height="2" fill="#F0CF98"/><rect x="783" y="475" width="2" height="2" fill="#F0CF98"/><rect x="779" y="477" width="6" height="2" fill="#F0CF98"/><rect x="779" y="479" width="2" height="2" fill="#F0CF98"/><rect x="783" y="479" width="2" height="2" fill="#F0CF98"/><rect x="779" y="481" width="2" height="2" fill="#F0CF98"/><rect x="783" y="481" width="2" height="2" fill="#F0CF98"/><rect x="789" y="473" width="4" height="2" fill="#F0CF98"/><rect x="787" y="475" width="2" height="2" fill="#F0CF98"/><rect x="787" y="477" width="2" height="2" fill="#F0CF98"/><rect x="787" y="479" width="2" height="2" fill="#F0CF98"/><rect x="789" y="481" width="4" height="2" fill="#F0CF98"/><rect x="795" y="473" width="2" height="2" fill="#F0CF98"/><rect x="799" y="473" width="2" height="2" fill="#F0CF98"/><rect x="795" y="475" width="2" height="2" fill="#F0CF98"/><rect x="799" y="475" width="2" height="2" fill="#F0CF98"/><rect x="795" y="477" width="6" height="2" fill="#F0CF98"/><rect x="795" y="479" width="2" height="2" fill="#F0CF98"/><rect x="799" y="479" width="2" height="2" fill="#F0CF98"/><rect x="795" y="481" width="2" height="2" fill="#F0CF98"/><rect x="799" y="481" width="2" height="2" fill="#F0CF98"/><rect x="805" y="473" width="2" height="2" fill="#F0CF98"/><rect x="803" y="475" width="2" height="2" fill="#F0CF98"/><rect x="807" y="475" width="2" height="2" fill="#F0CF98"/><rect x="803" y="477" width="6" height="2" fill="#F0CF98"/><rect x="803" y="479" width="2" height="2" fill="#F0CF98"/><rect x="807" y="479" width="2" height="2" fill="#F0CF98"/><rect x="803" y="481" width="2" height="2" fill="#F0CF98"/><rect x="807" y="481" width="2" height="2" fill="#F0CF98"/><rect x="786" y="492" width="8" height="2" fill="#5D6573"/><rect x="782" y="494" width="16" height="2" fill="#5D6573"/><rect x="782" y="496" width="16" height="2" fill="#5D6573"/><rect x="780" y="498" width="20" height="2" fill="#5D6573"/><rect x="780" y="500" width="20" height="2" fill="#5D6573"/><rect x="780" y="502" width="20" height="2" fill="#5D6573"/><rect x="780" y="504" width="20" height="2" fill="#5D6573"/><rect x="782" y="506" width="16" height="2" fill="#5D6573"/><rect x="782" y="508" width="16" height="2" fill="#5D6573"/><rect x="786" y="510" width="8" height="2" fill="#5D6573"/><rect x="786" y="494" width="8" height="2" fill="#B8C0CC"/><rect x="784" y="496" width="12" height="2" fill="#B8C0CC"/><rect x="782" y="498" width="16" height="2" fill="#B8C0CC"/><rect x="782" y="500" width="16" height="2" fill="#B8C0CC"/><rect x="782" y="502" width="16" height="2" fill="#B8C0CC"/><rect x="782" y="504" width="16" height="2" fill="#B8C0CC"/><rect x="784" y="506" width="12" height="2" fill="#B8C0CC"/><rect x="786" y="508" width="8" height="2" fill="#B8C0CC"/><rect x="780" y="500" width="20" height="4" fill="#8A93A3"/><rect x="780" y="500" width="20" height="2" fill="#D6DCE4"/><rect x="788" y="500" width="4" height="4" fill="#5D6573"/><rect x="804" y="492" width="8" height="16" fill="#8A93A3"/><rect x="806" y="494" width="4" height="12" fill="#1C1414"/><rect x="762" y="494" width="12" height="10" fill="#E9DDC5"/><rect x="764" y="497" width="8" height="2" fill="#82362F"/><rect x="764" y="500" width="6" height="2" fill="#82362F"/><rect x="776" y="518" width="28" height="16" fill="#1C1414"/><rect x="778" y="520" width="24" height="6" fill="#3A3F4A"/><rect x="778" y="520" width="24" height="2" fill="#5A606C"/><rect x="784" y="528" width="10" height="4" fill="#71998A"/><rect x="762" y="376" width="56" height="80" fill="#1A1D24"/><rect x="758" y="380" width="64" height="72" fill="#1A1D24"/><rect x="754" y="388" width="72" height="56" fill="#1A1D24"/><rect x="764" y="378" width="52" height="76" fill="#2E2C4A"/><rect x="760" y="382" width="60" height="68" fill="#2E2C4A"/><rect x="756" y="390" width="68" height="52" fill="#2E2C4A"/><rect x="764" y="434" width="8" height="2" fill="#1A1D24"/><rect x="762" y="436" width="12" height="2" fill="#1A1D24"/><rect x="760" y="438" width="16" height="2" fill="#1A1D24"/><rect x="760" y="440" width="16" height="2" fill="#1A1D24"/><rect x="760" y="442" width="16" height="2" fill="#1A1D24"/><rect x="760" y="444" width="16" height="2" fill="#1A1D24"/><rect x="762" y="446" width="12" height="2" fill="#1A1D24"/><rect x="764" y="448" width="8" height="2" fill="#1A1D24"/><rect x="764" y="436" width="8" height="2" fill="#D8746A"/><rect x="762" y="438" width="12" height="2" fill="#D8746A"/><rect x="762" y="440" width="12" height="2" fill="#D8746A"/><rect x="762" y="442" width="12" height="2" fill="#E9DDC5"/><rect x="762" y="444" width="12" height="2" fill="#E9DDC5"/><rect x="764" y="446" width="8" height="2" fill="#E9DDC5"/><rect x="762" y="441" width="12" height="2" fill="#000" opacity="0.25"/><rect x="764" y="439" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="780" y="436" width="8" height="2" fill="#1A1D24"/><rect x="778" y="438" width="12" height="2" fill="#1A1D24"/><rect x="776" y="440" width="16" height="2" fill="#1A1D24"/><rect x="776" y="442" width="16" height="2" fill="#1A1D24"/><rect x="776" y="444" width="16" height="2" fill="#1A1D24"/><rect x="776" y="446" width="16" height="2" fill="#1A1D24"/><rect x="778" y="448" width="12" height="2" fill="#1A1D24"/><rect x="780" y="450" width="8" height="2" fill="#1A1D24"/><rect x="780" y="438" width="8" height="2" fill="#71998A"/><rect x="778" y="440" width="12" height="2" fill="#71998A"/><rect x="778" y="442" width="12" height="2" fill="#71998A"/><rect x="778" y="444" width="12" height="2" fill="#E9DDC5"/><rect x="778" y="446" width="12" height="2" fill="#E9DDC5"/><rect x="780" y="448" width="8" height="2" fill="#E9DDC5"/><rect x="778" y="443" width="12" height="2" fill="#000" opacity="0.25"/><rect x="780" y="441" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="796" y="434" width="8" height="2" fill="#1A1D24"/><rect x="794" y="436" width="12" height="2" fill="#1A1D24"/><rect x="792" y="438" width="16" height="2" fill="#1A1D24"/><rect x="792" y="440" width="16" height="2" fill="#1A1D24"/><rect x="792" y="442" width="16" height="2" fill="#1A1D24"/><rect x="792" y="444" width="16" height="2" fill="#1A1D24"/><rect x="794" y="446" width="12" height="2" fill="#1A1D24"/><rect x="796" y="448" width="8" height="2" fill="#1A1D24"/><rect x="796" y="436" width="8" height="2" fill="#D9AD70"/><rect x="794" y="438" width="12" height="2" fill="#D9AD70"/><rect x="794" y="440" width="12" height="2" fill="#D9AD70"/><rect x="794" y="442" width="12" height="2" fill="#E9DDC5"/><rect x="794" y="444" width="12" height="2" fill="#E9DDC5"/><rect x="796" y="446" width="8" height="2" fill="#E9DDC5"/><rect x="794" y="441" width="12" height="2" fill="#000" opacity="0.25"/><rect x="796" y="439" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="810" y="432" width="8" height="2" fill="#1A1D24"/><rect x="808" y="434" width="12" height="2" fill="#1A1D24"/><rect x="806" y="436" width="16" height="2" fill="#1A1D24"/><rect x="806" y="438" width="16" height="2" fill="#1A1D24"/><rect x="806" y="440" width="16" height="2" fill="#1A1D24"/><rect x="806" y="442" width="16" height="2" fill="#1A1D24"/><rect x="808" y="444" width="12" height="2" fill="#1A1D24"/><rect x="810" y="446" width="8" height="2" fill="#1A1D24"/><rect x="810" y="434" width="8" height="2" fill="#9B89D1"/><rect x="808" y="436" width="12" height="2" fill="#9B89D1"/><rect x="808" y="438" width="12" height="2" fill="#9B89D1"/><rect x="808" y="440" width="12" height="2" fill="#E9DDC5"/><rect x="808" y="442" width="12" height="2" fill="#E9DDC5"/><rect x="810" y="444" width="8" height="2" fill="#E9DDC5"/><rect x="808" y="439" width="12" height="2" fill="#000" opacity="0.25"/><rect x="810" y="437" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="772" y="420" width="8" height="2" fill="#1A1D24"/><rect x="770" y="422" width="12" height="2" fill="#1A1D24"/><rect x="768" y="424" width="16" height="2" fill="#1A1D24"/><rect x="768" y="426" width="16" height="2" fill="#1A1D24"/><rect x="768" y="428" width="16" height="2" fill="#1A1D24"/><rect x="768" y="430" width="16" height="2" fill="#1A1D24"/><rect x="770" y="432" width="12" height="2" fill="#1A1D24"/><rect x="772" y="434" width="8" height="2" fill="#1A1D24"/><rect x="772" y="422" width="8" height="2" fill="#6AA0D8"/><rect x="770" y="424" width="12" height="2" fill="#6AA0D8"/><rect x="770" y="426" width="12" height="2" fill="#6AA0D8"/><rect x="770" y="428" width="12" height="2" fill="#E9DDC5"/><rect x="770" y="430" width="12" height="2" fill="#E9DDC5"/><rect x="772" y="432" width="8" height="2" fill="#E9DDC5"/><rect x="770" y="427" width="12" height="2" fill="#000" opacity="0.25"/><rect x="772" y="425" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="788" y="422" width="8" height="2" fill="#1A1D24"/><rect x="786" y="424" width="12" height="2" fill="#1A1D24"/><rect x="784" y="426" width="16" height="2" fill="#1A1D24"/><rect x="784" y="428" width="16" height="2" fill="#1A1D24"/><rect x="784" y="430" width="16" height="2" fill="#1A1D24"/><rect x="784" y="432" width="16" height="2" fill="#1A1D24"/><rect x="786" y="434" width="12" height="2" fill="#1A1D24"/><rect x="788" y="436" width="8" height="2" fill="#1A1D24"/><rect x="788" y="424" width="8" height="2" fill="#E88AA8"/><rect x="786" y="426" width="12" height="2" fill="#E88AA8"/><rect x="786" y="428" width="12" height="2" fill="#E88AA8"/><rect x="786" y="430" width="12" height="2" fill="#E9DDC5"/><rect x="786" y="432" width="12" height="2" fill="#E9DDC5"/><rect x="788" y="434" width="8" height="2" fill="#E9DDC5"/><rect x="786" y="429" width="12" height="2" fill="#000" opacity="0.25"/><rect x="788" y="427" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="804" y="418" width="8" height="2" fill="#1A1D24"/><rect x="802" y="420" width="12" height="2" fill="#1A1D24"/><rect x="800" y="422" width="16" height="2" fill="#1A1D24"/><rect x="800" y="424" width="16" height="2" fill="#1A1D24"/><rect x="800" y="426" width="16" height="2" fill="#1A1D24"/><rect x="800" y="428" width="16" height="2" fill="#1A1D24"/><rect x="802" y="430" width="12" height="2" fill="#1A1D24"/><rect x="804" y="432" width="8" height="2" fill="#1A1D24"/><rect x="804" y="420" width="8" height="2" fill="#D8746A"/><rect x="802" y="422" width="12" height="2" fill="#D8746A"/><rect x="802" y="424" width="12" height="2" fill="#D8746A"/><rect x="802" y="426" width="12" height="2" fill="#E9DDC5"/><rect x="802" y="428" width="12" height="2" fill="#E9DDC5"/><rect x="804" y="430" width="8" height="2" fill="#E9DDC5"/><rect x="802" y="425" width="12" height="2" fill="#000" opacity="0.25"/><rect x="804" y="423" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="764" y="406" width="8" height="2" fill="#1A1D24"/><rect x="762" y="408" width="12" height="2" fill="#1A1D24"/><rect x="760" y="410" width="16" height="2" fill="#1A1D24"/><rect x="760" y="412" width="16" height="2" fill="#1A1D24"/><rect x="760" y="414" width="16" height="2" fill="#1A1D24"/><rect x="760" y="416" width="16" height="2" fill="#1A1D24"/><rect x="762" y="418" width="12" height="2" fill="#1A1D24"/><rect x="764" y="420" width="8" height="2" fill="#1A1D24"/><rect x="764" y="408" width="8" height="2" fill="#D9AD70"/><rect x="762" y="410" width="12" height="2" fill="#D9AD70"/><rect x="762" y="412" width="12" height="2" fill="#D9AD70"/><rect x="762" y="414" width="12" height="2" fill="#E9DDC5"/><rect x="762" y="416" width="12" height="2" fill="#E9DDC5"/><rect x="764" y="418" width="8" height="2" fill="#E9DDC5"/><rect x="762" y="413" width="12" height="2" fill="#000" opacity="0.25"/><rect x="764" y="411" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="780" y="406" width="8" height="2" fill="#1A1D24"/><rect x="778" y="408" width="12" height="2" fill="#1A1D24"/><rect x="776" y="410" width="16" height="2" fill="#1A1D24"/><rect x="776" y="412" width="16" height="2" fill="#1A1D24"/><rect x="776" y="414" width="16" height="2" fill="#1A1D24"/><rect x="776" y="416" width="16" height="2" fill="#1A1D24"/><rect x="778" y="418" width="12" height="2" fill="#1A1D24"/><rect x="780" y="420" width="8" height="2" fill="#1A1D24"/><rect x="780" y="408" width="8" height="2" fill="#9B89D1"/><rect x="778" y="410" width="12" height="2" fill="#9B89D1"/><rect x="778" y="412" width="12" height="2" fill="#9B89D1"/><rect x="778" y="414" width="12" height="2" fill="#E9DDC5"/><rect x="778" y="416" width="12" height="2" fill="#E9DDC5"/><rect x="780" y="418" width="8" height="2" fill="#E9DDC5"/><rect x="778" y="413" width="12" height="2" fill="#000" opacity="0.25"/><rect x="780" y="411" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="796" y="402" width="8" height="2" fill="#1A1D24"/><rect x="794" y="404" width="12" height="2" fill="#1A1D24"/><rect x="792" y="406" width="16" height="2" fill="#1A1D24"/><rect x="792" y="408" width="16" height="2" fill="#1A1D24"/><rect x="792" y="410" width="16" height="2" fill="#1A1D24"/><rect x="792" y="412" width="16" height="2" fill="#1A1D24"/><rect x="794" y="414" width="12" height="2" fill="#1A1D24"/><rect x="796" y="416" width="8" height="2" fill="#1A1D24"/><rect x="796" y="404" width="8" height="2" fill="#71998A"/><rect x="794" y="406" width="12" height="2" fill="#71998A"/><rect x="794" y="408" width="12" height="2" fill="#71998A"/><rect x="794" y="410" width="12" height="2" fill="#E9DDC5"/><rect x="794" y="412" width="12" height="2" fill="#E9DDC5"/><rect x="796" y="414" width="8" height="2" fill="#E9DDC5"/><rect x="794" y="409" width="12" height="2" fill="#000" opacity="0.25"/><rect x="796" y="407" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="810" y="406" width="8" height="2" fill="#1A1D24"/><rect x="808" y="408" width="12" height="2" fill="#1A1D24"/><rect x="806" y="410" width="16" height="2" fill="#1A1D24"/><rect x="806" y="412" width="16" height="2" fill="#1A1D24"/><rect x="806" y="414" width="16" height="2" fill="#1A1D24"/><rect x="806" y="416" width="16" height="2" fill="#1A1D24"/><rect x="808" y="418" width="12" height="2" fill="#1A1D24"/><rect x="810" y="420" width="8" height="2" fill="#1A1D24"/><rect x="810" y="408" width="8" height="2" fill="#E88AA8"/><rect x="808" y="410" width="12" height="2" fill="#E88AA8"/><rect x="808" y="412" width="12" height="2" fill="#E88AA8"/><rect x="808" y="414" width="12" height="2" fill="#E9DDC5"/><rect x="808" y="416" width="12" height="2" fill="#E9DDC5"/><rect x="810" y="418" width="8" height="2" fill="#E9DDC5"/><rect x="808" y="413" width="12" height="2" fill="#000" opacity="0.25"/><rect x="810" y="411" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="788" y="390" width="8" height="2" fill="#1A1D24"/><rect x="786" y="392" width="12" height="2" fill="#1A1D24"/><rect x="784" y="394" width="16" height="2" fill="#1A1D24"/><rect x="784" y="396" width="16" height="2" fill="#1A1D24"/><rect x="784" y="398" width="16" height="2" fill="#1A1D24"/><rect x="784" y="400" width="16" height="2" fill="#1A1D24"/><rect x="786" y="402" width="12" height="2" fill="#1A1D24"/><rect x="788" y="404" width="8" height="2" fill="#1A1D24"/><rect x="788" y="392" width="8" height="2" fill="#6AA0D8"/><rect x="786" y="394" width="12" height="2" fill="#6AA0D8"/><rect x="786" y="396" width="12" height="2" fill="#6AA0D8"/><rect x="786" y="398" width="12" height="2" fill="#E9DDC5"/><rect x="786" y="400" width="12" height="2" fill="#E9DDC5"/><rect x="788" y="402" width="8" height="2" fill="#E9DDC5"/><rect x="786" y="397" width="12" height="2" fill="#000" opacity="0.25"/><rect x="788" y="395" width="2" height="2" fill="#FFFFFF" opacity="0.7"/><rect x="756" y="390" width="68" height="52" fill="#9B89D1" opacity="0.12"/><rect x="762" y="388" width="4" height="26" fill="#FFFFFF" opacity="0.3"/><rect x="766" y="384" width="12" height="3" fill="#FFFFFF" opacity="0.3"/><rect x="812" y="420" width="4" height="12" fill="#FFFFFF" opacity="0.15"/><rect x="758" y="450" width="64" height="8" fill="#82362F"/><rect x="758" y="450" width="64" height="2" fill="#B5504A"/><rect x="766" y="370" width="48" height="10" fill="#1A1D24"/><rect x="766" y="372" width="48" height="8" fill="#B5504A"/><rect x="766" y="372" width="48" height="2" fill="#D8746A"/><rect x="784" y="364" width="12" height="8" fill="#82362F"/><rect x="786" y="364" width="8" height="2" fill="#B5504A"/></g><rect class="hit" x="748" y="362" width="84" height="192" fill="transparent"/></g>
+<g class="cat" aria-hidden="true"><rect x="870" y="546" width="44" height="5" fill="#000" opacity="0.35"/><g class="cat-tail"><rect x="900" y="536" width="18" height="10" fill="#2A1A12"/><rect x="910" y="524" width="10" height="18" fill="#2A1A12"/><rect x="910" y="520" width="10" height="8" fill="#2A1A12"/><rect x="902" y="538" width="14" height="6" fill="#C98A4B"/><rect x="912" y="526" width="6" height="14" fill="#C98A4B"/><rect x="912" y="522" width="6" height="4" fill="#9A6434"/></g><rect x="876" y="522" width="32" height="26" fill="#2A1A12"/><rect x="878" y="518" width="28" height="8" fill="#2A1A12"/><rect x="874" y="530" width="8" height="18" fill="#2A1A12"/><rect x="902" y="530" width="8" height="18" fill="#2A1A12"/><rect x="876" y="500" width="32" height="24" fill="#2A1A12"/><rect x="878" y="498" width="28" height="6" fill="#2A1A12"/><rect x="874" y="506" width="6" height="14" fill="#2A1A12"/><rect x="904" y="506" width="6" height="14" fill="#2A1A12"/><rect x="876" y="492" width="10" height="12" fill="#2A1A12"/><rect x="878" y="490" width="6" height="6" fill="#2A1A12"/><rect x="898" y="492" width="10" height="12" fill="#2A1A12"/><rect x="900" y="490" width="6" height="6" fill="#2A1A12"/><rect x="878" y="524" width="28" height="22" fill="#C98A4B"/><rect x="880" y="520" width="24" height="4" fill="#C98A4B"/><rect x="876" y="532" width="4" height="14" fill="#C98A4B"/><rect x="904" y="532" width="4" height="14" fill="#C98A4B"/><rect x="878" y="502" width="28" height="20" fill="#C98A4B"/><rect x="880" y="500" width="24" height="2" fill="#C98A4B"/><rect x="876" y="508" width="2" height="10" fill="#C98A4B"/><rect x="906" y="508" width="2" height="10" fill="#C98A4B"/><rect x="878" y="494" width="6" height="8" fill="#C98A4B"/><rect x="880" y="492" width="2" height="2" fill="#C98A4B"/><rect x="900" y="494" width="6" height="8" fill="#C98A4B"/><rect x="902" y="492" width="2" height="2" fill="#C98A4B"/><rect x="886" y="526" width="12" height="14" fill="#F0DCB8"/><rect x="900" y="526" width="6" height="18" fill="#9A6434"/><rect x="882" y="544" width="6" height="4" fill="#F0DCB8"/><rect x="896" y="544" width="6" height="4" fill="#F0DCB8"/><rect x="880" y="496" width="2" height="4" fill="#E8A0A0"/><rect x="902" y="496" width="2" height="4" fill="#E8A0A0"/><rect x="880" y="502" width="24" height="2" fill="#E0A868"/><rect x="886" y="502" width="2" height="4" fill="#9A6434"/><rect x="891" y="502" width="2" height="4" fill="#9A6434"/><rect x="896" y="502" width="2" height="4" fill="#9A6434"/><rect x="886" y="514" width="12" height="6" fill="#F0DCB8"/><rect x="883" y="508" width="4" height="4" fill="#2A1A12"/><rect x="883" y="508" width="2" height="2" fill="#F0CF98"/><rect x="897" y="508" width="4" height="4" fill="#2A1A12"/><rect x="897" y="508" width="2" height="2" fill="#F0CF98"/><rect x="891" y="514" width="2" height="2" fill="#E8A0A0"/><rect x="889" y="517" width="2" height="1" fill="#2A1A12"/><rect x="893" y="517" width="2" height="1" fill="#2A1A12"/><rect x="868" y="515" width="8" height="1" fill="#F0DCB8" opacity="0.7"/><rect x="868" y="518" width="8" height="1" fill="#F0DCB8" opacity="0.5"/><rect x="908" y="515" width="8" height="1" fill="#F0DCB8" opacity="0.7"/><rect x="908" y="518" width="8" height="1" fill="#F0DCB8" opacity="0.5"/></g>
+<g class="lights" aria-hidden="true"><g class="lamp-glow"><ellipse cx="42" cy="292" rx="96" ry="72" fill="#D9AD70" opacity="0.05"/><ellipse cx="42" cy="292" rx="65" ry="48" fill="#D9AD70" opacity="0.06"/><ellipse cx="42" cy="292" rx="38" ry="28" fill="#D9AD70" opacity="0.08"/></g><ellipse cx="44" cy="444" rx="56" ry="12" fill="#D9AD70" opacity="0.1"/><g class="lamp-glow"><ellipse cx="366" cy="168" rx="72" ry="44" fill="#D9AD70" opacity="0.05"/><ellipse cx="366" cy="168" rx="48" ry="29" fill="#D9AD70" opacity="0.06"/><ellipse cx="366" cy="168" rx="28" ry="17" fill="#D9AD70" opacity="0.08"/></g><polygon points="354,168 378,168 394,198 338,198" fill="#FFD99A" opacity="0.12"/><ellipse cx="332" cy="96" rx="52" ry="44" fill="#D9AD70" opacity="0.05"/><ellipse cx="332" cy="96" rx="35" ry="29" fill="#D9AD70" opacity="0.06"/><ellipse cx="332" cy="96" rx="20" ry="17" fill="#D9AD70" opacity="0.08"/><ellipse cx="612" cy="96" rx="52" ry="44" fill="#D9AD70" opacity="0.05"/><ellipse cx="612" cy="96" rx="35" ry="29" fill="#D9AD70" opacity="0.06"/><ellipse cx="612" cy="96" rx="20" ry="17" fill="#D9AD70" opacity="0.08"/><g class="screen-glow"><ellipse cx="472" cy="410" rx="92" ry="64" fill="#71998A" opacity="0.05"/><ellipse cx="472" cy="410" rx="62" ry="43" fill="#71998A" opacity="0.06"/><ellipse cx="472" cy="410" rx="36" ry="25" fill="#71998A" opacity="0.08"/></g><ellipse cx="547" cy="374" rx="20" ry="20" fill="#9B89D1" opacity="0.08"/><ellipse cx="547" cy="374" rx="13" ry="13" fill="#9B89D1" opacity="0.1"/><ellipse cx="547" cy="374" rx="8" ry="8" fill="#9B89D1" opacity="0.12"/><ellipse cx="176" cy="176" rx="18" ry="18" fill="#9B89D1" opacity="0.08"/><ellipse cx="176" cy="176" rx="12" ry="12" fill="#9B89D1" opacity="0.1"/><ellipse cx="176" cy="176" rx="7" ry="7" fill="#9B89D1" opacity="0.12"/><ellipse cx="548" cy="89" rx="14" ry="14" fill="#9B89D1" opacity="0.06"/><ellipse cx="548" cy="89" rx="9" ry="9" fill="#9B89D1" opacity="0.08"/><ellipse cx="548" cy="89" rx="5" ry="5" fill="#9B89D1" opacity="0.1"/><g class="seam-glow"><ellipse cx="712" cy="156" rx="36" ry="100" fill="#9B89D1" opacity="0.06"/><ellipse cx="712" cy="156" rx="24" ry="68" fill="#9B89D1" opacity="0.08"/><ellipse cx="712" cy="156" rx="14" ry="40" fill="#9B89D1" opacity="0.1"/></g><g class="seam-glow"><polygon points="690,248 734,248 756,296 668,296" fill="#9B89D1" opacity="0.09"/><polygon points="702,248 722,248 730,276 694,276" fill="#C5B8F0" opacity="0.09"/></g><ellipse cx="712" cy="52" rx="40" ry="14" fill="#9B89D1" opacity="0.05"/><ellipse cx="712" cy="52" rx="27" ry="9" fill="#9B89D1" opacity="0.07"/><ellipse cx="712" cy="52" rx="16" ry="5" fill="#9B89D1" opacity="0.09"/><ellipse cx="790" cy="414" rx="50" ry="44" fill="#9B89D1" opacity="0.04"/><ellipse cx="790" cy="414" rx="34" ry="29" fill="#9B89D1" opacity="0.05"/><ellipse cx="790" cy="414" rx="20" ry="17" fill="#9B89D1" opacity="0.06"/></g>
+<rect width="960" height="600" fill="url(#vig)" pointer-events="none" aria-hidden="true"/>
+</svg>
+        <div class="tip" id="tip" aria-hidden="true"></div>
+      </div>
+    </div>
+    <p class="hint">
+      <span class="desk-only">點擊家具開始探索。使用鍵盤時，按 <kbd>Tab</kbd> 選取、<kbd>Enter</kbd> 開啟。</span>
+      <span class="touch-only">左右滑動看看整個大廳，點家具就能打開。找不到的話，用上方的「快速探索」。</span>
+    </p>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-sub">
+    <div class="modal-head">
+      <div class="modal-head-text">
+        <h2 id="modal-title" tabindex="-1"></h2>
+        <p id="modal-sub"></p>
+      </div>
+      <button type="button" class="btn modal-close" id="modal-close" aria-label="關閉視窗">
+        <svg viewBox="0 0 7 7" shape-rendering="crispEdges" aria-hidden="true" fill="currentColor"><rect x="0" y="0" width="1" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   作品資料（SITE_DATA）
+   ---------------------------------------------------------
+   之後只要修改這一區即可更新網站內容，不必動到下方程式。
+   - works：所有角色作品。圖庫、搜尋、分類、精選、終端機、扭蛋機都讀這份資料。
+       cover：封面圖片網址（https:// 開頭，或 repo 內的相對路徑如 covers/xxx.webp），留空會顯示佔位卡。
+       url  ：作品外部連結（需為 https://），留空會顯示「尚未開放」。
+       tags ：自由標籤，會顯示在詳細資料裡，也能被搜尋。含 NSFW 的作品封面會標示 18+。
+       worldId：所屬世界觀的 id（對應 worlds），沒有就留空。
+       featured：true 會加入沙發區的精選推薦（超過 6 個時每次隨機展示 6 個）。
+   - categories：主分類與自動歸類規則。
+   - worlds：世界觀資料，角色數量會自動計算。
+   - updates：公告欄。workId 可連到某個作品；或填 url 連到外部網址。
+   ========================================================= */
+window.SITE_DATA = {
+  site: {
+    title: "中繼休息大廳",
+    subtitle: "The Interlude Lounge",
+    welcome: "歡迎來到中繼休息大廳。這裡收錄通往不同故事的入口，請隨意探索。"
+  },
+
+  /* 主分類：電梯樓層與圖庫篩選鍵。
+     作品只要在 tags 裡出現任一個對應標籤，就會自動歸入該分類；
+     也可以在作品上直接寫 categories: [...] 手動指定。 */
+  categories: [
+    { name: "單人角色",   tags: ["單人"] },
+    { name: "多人／群像", tags: ["多人"] },
+    { name: "現代日常",   tags: ["日常"] },
+    { name: "奇幻／異世界", tags: ["奇幻"] },
+    { name: "哨兵嚮導",   tags: ["哨兵嚮導"] },
+    { name: "特殊世界觀", tags: ["ABO", "異能", "非人類", "獸人", "賽博龐克"] },
+    { name: "古風／異國", tags: ["古風", "武俠", "皇帝", "埃及"] }
+  ],
+
+  /* 世界觀：tagline 與 summary 可以之後再補，角色數量會自動計算。 */
+  worlds: [
+    {"id": "sentinel", "name": "哨兵嚮導", "tagline": "", "summary": ""},
+    {"id": "hongkong", "name": "香港", "tagline": "", "summary": ""},
+    {"id": "abo", "name": "ABO", "tagline": "", "summary": ""},
+    {"id": "japan", "name": "日本", "tagline": "", "summary": ""},
+    {"id": "zero-city", "name": "零號都市", "tagline": "", "summary": ""},
+    {"id": "lab", "name": "實驗體", "tagline": "", "summary": ""}
+  ],
+
+  /* 角色作品：依試算表順序排列。 */
+  works: [
+    {"id": "cd-0d530703", "title": "薩沃 | 我的米蘭房東管很多", "description": "租金低得不合理，房東帥得太過分。他會問你幾點回家、早餐吃什麼，什麼都能談——除了不吃飯。住久了才發現，他早把你算進自己的生活。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/90c57e0c-6028-4ed7-be2d-7b1b0b74cf4a?v=2ac057", "url": "https://caveduck.io/zh-hant/share/characters/0d530703-076e-4146-b308-1b31999088ba?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "甜寵", "黑幫", "西方風格"], "worldId": "", "featured": true},
+    {"id": "cd-04a42f39", "title": "我的遊戲老公住樓上", "description": "他是你的樓上室友，也是你遊戲裡那個天天叫你寶貝的網友。\n你以為他現實裡容易臉紅、單純又好欺負，後來才知道，他只是很會裝。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/553af981-8b42-4389-874b-f1a7014867f2?v=32f58e", "url": "https://caveduck.io/zh-hant/share/characters/04a42f39-12f7-4d4e-a456-8dc2676431fd?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "甜寵", "秘密", "溫柔", "網路戀愛", "戀人"], "worldId": "", "featured": true},
+    {"id": "cd-07d0d4bd", "title": "我找了假男友擋家族婚約", "description": "為了逃掉一場婚約，你需要一個看起來足夠不合適的男朋友。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/d4a1f2d4-dfb2-4cf1-a2fb-0edbbc6f7fe7?v=d8f52b", "url": "https://caveduck.io/zh-hant/share/characters/07d0d4bd-b41c-425f-a5ee-2a312f463172?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "秘密"], "worldId": "", "featured": true},
+    {"id": "cd-1e2a018d", "title": "艾略特・阿什福德", "description": "全校都想知道他的房號，只有你可能拿到鑰匙。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/8aec2fb4-858f-4b66-bb07-0c3d76c43650?v=abe752", "url": "https://caveduck.io/zh-hant/share/characters/1e2a018d-0656-4394-96e7-2983046b74ef?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "運動", "西方風格"], "worldId": "", "featured": true},
+    {"id": "cd-86589895", "title": "韓知晏", "description": "樂團主唱，Alpha，性愛分離的思考方式", "cover": "https://ik.imagekit.io/ttqqq80wx6/%E9%9F%93%E7%9F%A5%E6%99%8F/04%EF%BD%9CSEEN%20AT%200247.png", "url": "https://caveduck.io/zh-hant/share/characters/86589895-a978-4dd8-99b8-93d00a079513?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "ABO", "炮友", "NSFW"], "worldId": "abo", "featured": true},
+    {"id": "cd-3f243629", "title": "戴著婚戒和你上床的男人", "description": "你是他明知不該碰，一次後戒不掉的癮。\n她是他要好好珍惜的一生。", "cover": "https://ik.imagekit.io/ttqqq80wx6/chan/user_view_F.jpg", "url": "https://caveduck.io/zh-hant/share/characters/3f243629-be52-44ba-a342-8702003b46f4?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "NTR", "炮友", "秘密", "NSFW"], "worldId": "", "featured": true},
+    {"id": "cd-ef2c7c62", "title": "徐道允", "description": "當紅偶像演員換過經紀人、換過團隊，卻始終沒改掉一有空就跑去第一任經紀人——你家睡覺的習慣。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/13151938-349d-4659-aaaf-8e888eb35187?v=96d41f", "url": "https://caveduck.io/zh-hant/share/characters/ef2c7c62-99a5-47f5-8d37-2175f4228889?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "甜寵", "秘密", "明星"], "worldId": "", "featured": true},
+    {"id": "cd-3d5f9e45", "title": "哨兵導師─車銀燁", "description": "他是個社會定義上的混帳垃圾，喝酒抽菸賭博，還有想爬上他床的人。\n但他有著最高軍銜。 頂著最強哨兵的頭銜。", "cover": "https://i.postimg.cc/K8kQkL6W/Chat-GPT-Image-2026nian7yue8ri-xia-wu05-18-28-(1).png", "url": "https://caveduck.io/zh-hant/share/characters/3d5f9e45-d596-4585-8786-1a94a1a1693b?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "哨兵嚮導", "奇幻", "軍事", "NSFW"], "worldId": "sentinel", "featured": true},
+    {"id": "cd-31b35265", "title": "雙胞胎兄弟:韓時允&韓時言", "description": "那對校園風雲的雙胞胎", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/4bd04e68-26b5-4617-81d3-b818b245ae31?v=3ec4e2", "url": "https://caveduck.io/zh-hant/share/characters/31b35265-29ce-44eb-b6f0-af39434583d1?rc=xs64pf6huu&_share_hash=", "tags": ["多人", "日常", "學院"], "worldId": "", "featured": true},
+    {"id": "cd-ee0d4898", "title": "韓陸謙", "description": "老是跑你家的青梅竹馬", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/d6dd9816-4b85-49c7-b751-a9d03ce3cd37?v=7b92e6", "url": "https://caveduck.io/zh-hant/share/characters/ee0d4898-0735-4574-a83a-4f484bbe0101?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "ABO", "青梅竹馬", "NSFW"], "worldId": "abo", "featured": true},
+    {"id": "cd-bc5da015", "title": "藍鎮賢", "description": "他身邊的人換了一季又一季，只有你的位子，二十多年來從沒有人敢坐。", "cover": "https://i.postimg.cc/D03rqQ4R/Chat-GPT-Image-2026nian7yue22ri-shang-wu09-10-35.jpg", "url": "https://caveduck.io/zh-hant/share/characters/bc5da015-ff06-4de5-aed9-217ef6f6decf?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "香港", "青梅竹馬", "財閥", "NSFW"], "worldId": "hongkong", "featured": false},
+    {"id": "cd-7683e40d", "title": "霜脊防線 | 成了獸人哨兵的嚮導", "description": "毛茸茸的適合摸一把！\n說好的高冷哨兵呢？\n雪鴞愛管、白熊護食、雪豹腹黑、冰狼嘴賤，還有個慢悠悠的巨鹿族長。你原以為北境生活很嚴肅，直到認識這五個男人", "cover": "https://ik.imagekit.io/ttqqq80wx6/%E9%9C%9C%E8%84%8A%E6%88%B0%E7%B7%9A.mp4", "url": "https://caveduck.io/zh-hant/share/characters/7683e40d-a1d1-4d2a-84c8-9e432f1f8d43?rc=xs64pf6huu&_share_hash=", "tags": ["多人", "哨兵嚮導", "奇幻", "軍事", "獸人", "NSFW"], "worldId": "sentinel", "featured": true},
+    {"id": "cd-17851d8f", "title": "被S級讀心者盯上", "description": "貓捉老鼠的遊戲開始，他在零號都市是最難搞的存在。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/6521efec-5007-4968-b455-8ee986285763?v=0e06ec", "url": "https://caveduck.io/zh-hant/share/characters/17851d8f-4815-40b8-890b-f8f0da8dd223?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "奇幻", "賽博龐克", "異能", "佔有慾", "NSFW"], "worldId": "zero-city", "featured": false},
+    {"id": "cd-f2e5d5b3", "title": "周廷岳", "description": "你回香港，來接你的是前男友。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/075bad08-abc9-44e7-bead-45fdf78d22e1?v=f8cc70", "url": "https://caveduck.io/zh-hant/share/characters/f2e5d5b3-da06-4598-bf38-a9fd4aa95a00?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "香港", "前男友", "財閥"], "worldId": "hongkong", "featured": false},
+    {"id": "cd-1f0236cf", "title": "實驗體 A-000 | 亞當Adam", "description": "老往你家跑的實驗體", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/214f59c2-642f-470a-a562-cf87aa54ee01?v=3d5eee", "url": "https://caveduck.io/zh-hant/share/characters/1f0236cf-090f-4559-a015-88e8f6fb516e?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "西方風格", "軍事", "非人類"], "worldId": "lab", "featured": false},
+    {"id": "cd-3db961bd", "title": "我男友的經紀人", "description": "男友外遇後，他的經紀人把我帶走了。\n知道真相的權利，和不知道真相時得到的幸福，哪個比較重要？", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/287b3688-2dcb-4f63-a9dc-5ec8fef17dd1?v=49eeb9", "url": "https://caveduck.io/zh-hant/share/characters/3db961bd-6f59-44bc-aaac-896659ffaa10?rc=xs64pf6huu&_share_hash=", "tags": ["多人", "日常", "NTR", "明星", "秘密", "NSFW"], "worldId": "", "featured": false},
+    {"id": "cd-c26245fa", "title": "尼可・沃斯", "description": "那個幾乎二十四小時在線上的曖昧網友，沒想到是最近老出現在你旁邊的滑雪好手", "cover": "https://ik.imagekit.io/ttqqq80wx6/%E5%B0%BC%E5%8F%AF_%E6%B2%83%E6%96%AF/4.jpg", "url": "https://caveduck.io/zh-hant/share/characters/c26245fa-b61d-4755-8513-14af5deee46e?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "甜寵", "秘密", "溫柔", "網路戀愛", "運動"], "worldId": "", "featured": false},
+    {"id": "cd-e96ef967", "title": "白京玄司", "description": "他把你撿回他的大宅。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/cd5bb4d7-cfcb-4211-aeb2-81bb9f462884?v=279dd8", "url": "https://caveduck.io/zh-hant/share/characters/e96ef967-d80d-4766-8e27-26f480fe7417?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "甜寵", "秘密", "溫柔", "佔有慾", "東方風格", "非人類"], "worldId": "japan", "featured": false},
+    {"id": "cd-6e31478b", "title": "賀景川", "description": "「我們現在這樣不是很好嗎？為什麼非得改變？」", "cover": "https://ik.imagekit.io/ttqqq80wx6/inn/%E8%B3%80%E6%99%AF%E5%B7%9D.jpg", "url": "https://caveduck.io/zh-hant/share/characters/6e31478b-ed58-42a2-86d8-31b8301cadce?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "香港", "秘書", "財閥"], "worldId": "hongkong", "featured": false},
+    {"id": "cd-bd199b59", "title": "目澤黑棘", "description": "你睡了一個黑街老大。三年後，整條大阪黑街都知道——他沒打算讓你睡完就跑。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/b0759eb7-b801-4690-aa76-e74001ca7f0c?v=59d086", "url": "https://caveduck.io/zh-hant/share/characters/bd199b59-4b85-48c3-9d39-70b45bde4a61?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "黑道", "秘密", "佔有慾", "東方風格", "非人類", "NSFW"], "worldId": "japan", "featured": false},
+    {"id": "cd-ecd7ca26", "title": "梁敘衡", "description": "一覺醒來忘了十年，竹馬仍在——可你嫁的，竟是他那位身居高位的小叔", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/b053496a-31c0-41c7-b8f4-2c854f993089?v=ec7ddf", "url": "https://caveduck.io/zh-hant/share/characters/ecd7ca26-64b2-45e2-aa32-29f90729842b?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "財閥", "秘密", "佔有慾", "年長", "東方風格", "NSFW"], "worldId": "hongkong", "featured": false},
+    {"id": "cd-a8ffb397", "title": "尹載暄", "description": "他說這場婚姻只是合約，卻總在你最麻煩的時候親自出現。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/a836c0ef-604e-4daa-a762-2f85ca607037?v=e90074", "url": "https://caveduck.io/zh-hant/share/characters/a8ffb397-9dab-4b74-9d22-6af637942b0f?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "財閥", "佔有慾", "聯姻"], "worldId": "hongkong", "featured": false},
+    {"id": "cd-146e24e2", "title": "活得很爽的危險份子 | 翟本斌", "description": "性很便宜，生活很貴。爛是種選擇，你和他關係也是。\n「站外頭幹什麼，進來。」", "cover": "https://cdn.caveduck.io/charim-standard/f83a758a-8e12-4a1d-9cd5-7dfa3854cd00?v=975d94", "url": "https://caveduck.io/zh-hant/share/characters/146e24e2-b61d-41ed-a259-2a0435daba9a?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "黑幫", "年長", "佔有慾", "NSFW"], "worldId": "", "featured": false},
+    {"id": "cd-1db93ad4", "title": "你的專屬健身陪練", "description": "你只想在APP上找個健身搭子。齊允盛陪你練、約你吃飯，把曖昧練成日常——你以為是剛好合拍，他卻從一開始就沒打算只當搭子。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/7d6a0008-f05e-4f10-8eb5-267f71ae3b02?v=0d4da7", "url": "https://caveduck.io/zh-hant/share/characters/1db93ad4-4ce9-4299-865b-41a27aa223b0?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "秘密", "佔有慾", "運動"], "worldId": "", "featured": false},
+    {"id": "cd-8c9fc46a", "title": "久世征臣", "description": "他抽雪茄，貴的，聞不出臭味的。喜歡花紋襯衫，總是笑的沒心沒肺的。沒事時候就去探你的班。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/0051c557-e3fd-486e-afb8-8a57ff742835?v=d36728", "url": "https://caveduck.io/zh-hant/share/characters/8c9fc46a-ca57-44fc-a666-039b33df073b?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "財閥", "黑道", "佔有慾", "明星"], "worldId": "japan", "featured": false},
+    {"id": "cd-2fc290b4", "title": "電競隊長住我家", "description": "隔壁電競基地水管炸了。AG隊長拖著行李住進你家，而你那位欠揍的深夜網友照常傳來訊息。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/76c787b3-2b01-45c8-b954-d3dc65718b8d?v=e6e022", "url": "https://caveduck.io/zh-hant/share/characters/2fc290b4-0833-4b53-ac27-85f1930eca07?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "電競", "秘密", "網路戀愛", "甜寵"], "worldId": "", "featured": false},
+    {"id": "cd-ecc811bd", "title": "尹檀序", "description": "你的伴侶是灰色企業的總裁，他周遭的人都知道他有多寵你。(ABO世界觀)", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/4515a0dc-eaea-48b5-824c-01f6b1f98953?v=a7a772", "url": "https://caveduck.io/zh-hant/share/characters/ecc811bd-19fc-4445-aecf-0bdbc7b87c3b?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "ABO", "伴侶", "NSFW", "財閥", "黑幫"], "worldId": "abo", "featured": false},
+    {"id": "cd-8e72a317", "title": "第七監獄的兩位哨兵", "description": "蟲族攻破上層，你奉命釋放兩名清醒的屠夫。問題是，牢門打開後，他們同時看上了你。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/0f59701d-aa1b-4d74-9ac9-80b1a1c946b3?v=4f06c7", "url": "https://caveduck.io/zh-hant/share/characters/8e72a317-e165-430d-accf-3d2835c661f2?rc=xs64pf6huu&_share_hash=", "tags": ["多人", "哨兵嚮導", "奇幻", "軍事", "NSFW"], "worldId": "sentinel", "featured": false},
+    {"id": "cd-a4c073c1", "title": "S級哨兵-權司燦", "description": "欸，別這樣看我，我真的只是路過", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/5aad0fc3-e346-4d7a-9e8a-1e98c554c15f?v=e870e0", "url": "https://caveduck.io/zh-hant/share/characters/a4c073c1-50fc-4ca2-93fd-4dd730ac4af1?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "哨兵嚮導", "奇幻", "軍事", "NSFW"], "worldId": "sentinel", "featured": false},
+    {"id": "cd-8ea25008", "title": "言書邢", "description": "九龍有人叫他寨主。你只管叫他回家。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/fb212590-ac1f-4b5d-b6b0-574d50843031?v=d88838", "url": "https://caveduck.io/zh-hant/share/characters/8ea25008-2a31-445a-bc0e-4ce706bc45fd?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "黑幫", "年長", "甜寵"], "worldId": "hongkong", "featured": false},
+    {"id": "cd-69a63cf2", "title": "我揣了大老的種逃跑 | 單梟", "description": "懷了單梟的孩子，你卻從他身邊消失整整一個月。再推開出租屋的門，那位斯文敗類正慢條斯理地擦著眼鏡：「回來了？跟老子解釋一下。」", "cover": "https://cdn.caveduck.io/charim-standard/765627b9-dd97-48c8-a2ba-d2b9e9c0e6d7?v=fdd00f", "url": "https://caveduck.io/zh-hant/share/characters/69a63cf2-f1c4-466a-bd8e-629e2d201636?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "黑幫", "年長", "甜寵", "獸人", "奇幻", "NSFW"], "worldId": "", "featured": false},
+    {"id": "cd-2ede2fb0", "title": "權伊森", "description": "他在軍隊裡是人見人怕的教官，又愛又恨的存在。\n他關係開放，來者不拒。\n但新兵們最大難關是從他手下活著。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/88aaa700-b2b3-44b3-9c62-427016213c54?v=8d1b41", "url": "https://caveduck.io/zh-hant/share/characters/2ede2fb0-0fd5-457a-a525-225b3259c493?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "軍事", "肌肉", "BDSM", "NSFW"], "worldId": "", "featured": false},
+    {"id": "cd-52b15a84", "title": "車元俊", "description": "強制同居。「收東西，今晚開始住我那。」\n這次，車元俊不打算再讓你離開。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/8e0734d4-8e8c-4ae0-8790-5258ed509229?v=080572", "url": "https://caveduck.io/zh-hant/share/characters/52b15a84-bf72-4741-b31f-e3ea20f1bb9c?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "學院", "秘密", "佔有慾"], "worldId": "", "featured": false},
+    {"id": "cd-47bede00", "title": "我的皇叔 | 蕭承珣", "description": "他學會做大曜的靖王，卻沒學會永遠只當你的皇叔。", "cover": "https://ik.imagekit.io/ttqqq80wx6/Hsiao/1.jpg", "url": "https://caveduck.io/zh-hant/share/characters/47bede00-2ad6-4267-ad42-eb3cbe82b5dd?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "年長", "東方風格", "皇帝", "武俠"], "worldId": "", "featured": false},
+    {"id": "cd-0916602e", "title": "扎哈爾・沃爾科夫", "description": "最麻煩的S級哨兵，生化型。從個性到能力都麻煩。禮貌只是讓這份麻煩看起來像教養。", "cover": "https://ik.imagekit.io/ttqqq80wx6/Zakhar/Zakhar.jpg", "url": "https://caveduck.io/zh-hant/share/characters/0916602e-f6fa-44e8-ae53-04c0be51e9e4?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "哨兵嚮導", "奇幻", "軍事", "NSFW"], "worldId": "sentinel", "featured": false},
+    {"id": "cd-4bacd624", "title": "S級嚮導-徐泰律", "description": "別抬舉自己，我只是對會把本能當藉口的生物沒什麼耐心。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/3d809e1a-ad6e-4514-b04e-0729b34558cf?v=f35688", "url": "https://caveduck.io/zh-hant/share/characters/4bacd624-61b4-4829-9a31-ed8bec76528c?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "哨兵嚮導", "奇幻", "軍事", "NSFW"], "worldId": "sentinel", "featured": false},
+    {"id": "cd-591f48f2", "title": "匿名成人頻道情侶 | 安倫佐", "description": "你想解約但他不想。關機後他依舊像個大狗狗黏著你，這段關係究竟?", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/5bf7e273-e1bf-463e-a3a0-85c9d8984286?v=ccda86", "url": "https://caveduck.io/zh-hant/share/characters/591f48f2-5a63-4437-9572-3ed140b4a42b?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "秘密", "甜寵", "戀人", "NSFW"], "worldId": "", "featured": false},
+    {"id": "cd-8983a0f1", "title": "羅季昂・艾森哈特", "description": "交往一年的前男友親自找來。\n全知全能生化巨頭從來不是好惹的人。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/6e738f09-b979-44ee-85c1-817d54ea201c?v=3a5010", "url": "https://caveduck.io/zh-hant/share/characters/8983a0f1-bd8e-4446-9180-299dd92c4780?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "秘密", "黑幫", "戀人", "西方風格", "異能", "NSFW"], "worldId": "", "featured": true},
+    {"id": "cd-6fb01b26", "title": "奈赫特・賽拉蒙", "description": "法老看著你，說你是他的亡妻", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/bb51e245-679a-4559-92a2-923b40e562dd?v=b2fd8a", "url": "https://caveduck.io/zh-hant/share/characters/6fb01b26-11fa-4795-8343-e6a13bfd6e19?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "戀人", "西方風格", "埃及"], "worldId": "", "featured": false},
+    {"id": "cd-7cbcb150", "title": "錢鎮一", "description": "未婚夫手機可能有秘密。", "cover": "https://cdn.caveduck.io/cdn-cgi/image/f=auto,w=800/charim-standard/c63dd01b-627e-443d-9d6f-9ed7b3dc99b3?v=42ac02", "url": "https://caveduck.io/zh-hant/share/characters/7cbcb150-4a7f-4aaf-ab73-9792a1f2ec2e?rc=xs64pf6huu&_share_hash=", "tags": ["單人", "日常", "NTR", "炮友", "秘密", "NSFW"], "worldId": "", "featured": false}
+  ],
+
+  updates: [
+    { date: "2026-11-08", title: "中繼休息大廳開張", summary: "首批收錄 40 位角色。可以從書櫃開始逛，或者轉一次扭蛋。" }
+  ]
+};
+</script>
+
+<script>
+(() => {
+  'use strict';
+
+  const DATA = window.SITE_DATA || {};
+  DATA.works = Array.isArray(DATA.works) ? DATA.works : [];
+  DATA.worlds = Array.isArray(DATA.worlds) ? DATA.worlds : [];
+  DATA.updates = Array.isArray(DATA.updates) ? DATA.updates : [];
+  DATA.categories = Array.isArray(DATA.categories) ? DATA.categories : [];
+  DATA.site = DATA.site || {};
+
+  /* 主分類：支援字串或 { name, tags } 兩種寫法 */
+  const CATS = DATA.categories
+    .map(c => typeof c === 'string' ? { name: c, tags: [] } : { name: String((c && c.name) || ''), tags: Array.isArray(c && c.tags) ? c.tags : [] })
+    .filter(c => c.name);
+  const CAT_NAMES = CATS.map(c => c.name);
+  DATA.works.forEach(w => {
+    w.title = String(w.title || '').trim();
+    w.tags = (Array.isArray(w.tags) ? w.tags : String(w.tags || '').split('/')).map(x => String(x).trim()).filter(Boolean);
+    if (!Array.isArray(w.categories) || !w.categories.length) {
+      w.categories = CATS.filter(c => c.tags.some(tag => w.tags.includes(tag))).map(c => c.name);
+    }
+  });
+
+  const worksById = new Map(DATA.works.map(w => [w.id, w]));
+  const worldsById = new Map(DATA.worlds.map(w => [w.id, w]));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const NS = 'http://www.w3.org/2000/svg';
+  const ALL = '全部作品';
+
+  /* ---------- 小工具：安全建立 DOM，不使用 innerHTML ---------- */
+  function el(tag, attrs, ...kids) {
+    const n = document.createElement(tag);
+    if (attrs) {
+      for (const [k, v] of Object.entries(attrs)) {
+        if (v == null || v === false) continue;
+        if (k === 'class') n.className = v;
+        else if (k.startsWith('on') && typeof v === 'function') n.addEventListener(k.slice(2), v);
+        else n.setAttribute(k, v === true ? '' : String(v));
+      }
+    }
+    for (const c of kids.flat(2)) {
+      if (c == null || c === false) continue;
+      n.append(c instanceof Node ? c : String(c));
+    }
+    return n;
+  }
+  function svg(tag, attrs, ...kids) {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) n.setAttribute(k, String(v));
+    kids.forEach(c => n.append(c));
+    return n;
+  }
+  function pixelIcon(rects, size = 20) {
+    const s = svg('svg', { viewBox: `0 0 ${size} ${size}`, 'shape-rendering': 'crispEdges', 'aria-hidden': 'true', focusable: 'false' });
+    rects.forEach(([x, y, w, h, f]) => s.append(svg('rect', { x, y, width: w, height: h, fill: f })));
+    return s;
+  }
+  function isHttps(u) {
+    if (typeof u !== 'string' || !u.trim()) return false;
+    try { return new URL(u.trim()).protocol === 'https:'; } catch (e) { return false; }
+  }
+  function isSafeSrc(u) {
+    if (isHttps(u)) return true;
+    return typeof u === 'string' && /^(?![a-z][\w+.-]*:|\/\/)[\w\-./%]+\.(png|jpe?g|webp|gif|avif|mp4|webm)(\?.*)?$/i.test(u.trim());
+  }
+  function tags(w) { return Array.isArray(w.tags) ? w.tags : []; }
+  const isAdult = w => tags(w).some(x => x.toUpperCase() === 'NSFW');
+  const GENERIC = new Set(['單人', '多人', '日常', 'NSFW']);
+  function shortTags(w) { return tags(w).filter(x => !GENERIC.has(x)).slice(0, 3).join('、') || cats(w).join('、') || '未分類'; }
+  function shuffle(a) { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; }
+  function formatDate(d) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d || ''));
+    return m ? `${m[1]} 年 ${Number(m[2])} 月 ${Number(m[3])} 日` : String(d || '');
+  }
+  function hash(str) {
+    let h = 7;
+    for (const ch of String(str)) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+    return h;
+  }
+  function cssEsc(v) { return window.CSS && CSS.escape ? CSS.escape(v) : String(v).replace(/"/g, '\\"'); }
+  function byId(id) { return `[data-id="${cssEsc(id)}"]`; }
+  function cats(w) { return Array.isArray(w.categories) ? w.categories : []; }
+  function worksIn(cat) { return cat === ALL ? DATA.works.slice() : DATA.works.filter(w => cats(w).includes(cat)); }
+
+  /* ---------- 封面：有 https 網址就載入，否則畫佔位卡 ---------- */
+  const PH = [['#2F3D52', '#4A5F7E'], ['#3A2F45', '#5A4870'], ['#2F4540', '#4B6E64'], ['#45352A', '#6B533F'], ['#3B2A35', '#5E4454'], ['#2A3A4A', '#43607A']];
+  function placeholderCover(work) {
+    const [bg, mid] = PH[hash(work.id || work.title) % PH.length];
+    const s = svg('svg', { viewBox: '0 0 90 120', 'shape-rendering': 'crispEdges', preserveAspectRatio: 'xMidYMid slice', role: 'img', 'aria-label': `${work.title || '作品'}（封面待補）` });
+    s.append(
+      svg('rect', { width: 90, height: 120, fill: bg }),
+      svg('rect', { x: 4, y: 4, width: 82, height: 112, fill: 'none', stroke: mid, 'stroke-width': 2 }),
+      svg('rect', { x: 31, y: 24, width: 28, height: 42, fill: mid }),
+      svg('rect', { x: 35, y: 20, width: 20, height: 4, fill: mid }),
+      svg('rect', { x: 35, y: 28, width: 20, height: 38, fill: '#161E2B' }),
+      svg('rect', { x: 44, y: 30, width: 2, height: 34, fill: '#C5B8F0' }),
+      svg('rect', { x: 27, y: 66, width: 36, height: 2, fill: mid })
+    );
+    const ch = Array.from(String(work.title || '?'))[0];
+    const t1 = svg('text', { x: 45, y: 94, 'text-anchor': 'middle', 'font-size': 17, fill: '#E9DDC5', 'font-family': 'Songti TC, Noto Serif TC, serif', 'font-weight': 700 });
+    t1.textContent = ch;
+    const t2 = svg('text', { x: 45, y: 109, 'text-anchor': 'middle', 'font-size': 7, fill: '#B3A893', 'font-family': 'PingFang TC, Noto Sans TC, sans-serif' });
+    t2.textContent = '封面待補';
+    s.append(t1, t2);
+    return s;
+  }
+  function coverEl(work, opts = {}) {
+    const box = el('div', { class: 'cover' });
+    if (isSafeSrc(work.cover) && /\.(mp4|webm)(\?.*)?$/i.test(work.cover.trim())) {
+      const vid = el('video', { src: work.cover.trim(), muted: true, loop: true, playsinline: true, preload: 'metadata', 'aria-label': `${work.title} 的封面影片` });
+      vid.muted = true;
+      if (!reduceMotion.matches) vid.autoplay = true;
+      vid.addEventListener('error', () => vid.replaceWith(placeholderCover(work)), { once: true });
+      box.append(vid);
+    } else if (isSafeSrc(work.cover)) {
+      const img = el('img', { src: work.cover.trim(), alt: `${work.title} 的封面`, loading: opts.eager ? 'eager' : 'lazy', decoding: 'async' });
+      img.addEventListener('error', () => img.replaceWith(placeholderCover(work)), { once: true });
+      box.append(img);
+    } else {
+      box.append(placeholderCover(work));
+    }
+    const badges = [];
+    if (isAdult(work)) badges.push(el('span', { class: 'demo-badge badge-18', title: '含成人內容' }, '18+'));
+    if (work.demo && opts.badge !== false) badges.push(el('span', { class: 'demo-badge' }, '示範資料'));
+    if (badges.length) box.append(el('span', { class: 'badges' }, badges));
+    return box;
+  }
+  function linkEl(url, label = '進入作品') {
+    if (isHttps(url)) {
+      return el('a', { class: 'btn btn-primary', href: url.trim(), target: '_blank', rel: 'noopener noreferrer' },
+        label, el('span', { class: 'sr-only' }, '（在新分頁開啟）'));
+    }
+    return el('span', { class: 'btn btn-pending', 'aria-disabled': 'true' }, '尚未開放');
+  }
+  function emptyState(message, action) {
+    return el('div', { class: 'empty' }, el('p', null, message),
+      action ? el('p', null, el('button', { type: 'button', class: 'btn', onclick: action.onclick }, action.label)) : null);
+  }
+  function workRows(list, onOpen) {
+    return el('ul', { class: 'work-list' }, list.map(w => el('li', null,
+      el('button', { type: 'button', class: 'work-row', 'data-id': w.id, onclick: () => onOpen(w) },
+        coverEl(w, { badge: false }),
+        el('span', null, el('strong', null, w.title), el('small', null, shortTags(w))),
+        el('span', { class: 'go', 'aria-hidden': 'true' }, '查看')))));
+  }
+
+  /* ---------- 設施設定 ---------- */
+  const FAC = {
+    A: { name: '接待櫃台', title: '大廳導覽', desc: '使用說明與設施一覽', skin: 'counter', color: '#D9AD70', render: renderWelcome,
+         icon: [[2,12,16,6,'#7A5236'],[2,10,16,2,'#B5845A'],[4,4,2,6,'#8A93A3'],[2,2,6,2,'#D9AD70'],[10,8,6,2,'#E9DDC5']] },
+    B: { name: '書櫃', title: '角色圖庫', desc: '瀏覽、搜尋所有角色', skin: 'wood', color: '#B5845A', render: renderGallery,
+         icon: [[2,2,16,16,'#573A27'],[4,4,12,4,'#2B1F18'],[4,10,12,6,'#2B1F18'],[4,4,2,4,'#8E3B3B'],[6,5,2,3,'#3F5F8A'],[8,4,2,4,'#D9AD70'],[12,4,2,4,'#71998A'],[4,10,2,6,'#6A4A7A'],[6,12,2,4,'#A2793C'],[10,10,2,6,'#2F6B6B'],[12,11,2,5,'#8E3B3B']] },
+    C: { name: '公告欄', title: '近期更新', desc: '最近新增與調整的內容', skin: 'paper', color: '#E9DDC5', render: renderUpdates,
+         icon: [[2,2,16,14,'#7A5236'],[4,4,12,10,'#8C6B48'],[5,5,5,6,'#E9DDC5'],[11,5,4,4,'#A9CBBD'],[7,10,6,3,'#C5B8F0'],[7,4,2,2,'#B5504A']] },
+    D: { name: '沙發休息區', title: '精選推薦', desc: '先從這幾個故事開始', skin: 'lounge', color: '#8FB6A6', render: renderFeatured,
+         icon: [[2,8,16,4,'#5F8778'],[2,6,16,2,'#7FA595'],[2,10,2,6,'#476A5D'],[16,10,2,6,'#476A5D'],[4,12,12,4,'#6F9686'],[4,8,4,4,'#9B89D1']] },
+    E: { name: '資料終端機', title: '世界觀資料庫', desc: '依世界觀查閱角色', skin: 'screen', color: '#71998A', render: renderTerminal,
+         icon: [[2,2,14,12,'#B3A990'],[4,4,10,8,'#0F2A26'],[5,6,6,2,'#71998A'],[5,9,4,2,'#C5B8F0'],[4,16,12,2,'#C9C0AB'],[16,6,2,10,'#8F866F']] },
+    F: { name: '電梯', title: '作品分類', desc: '按樓層挑選作品類型', skin: 'lift', color: '#9B89D1', render: renderElevator,
+         icon: [[3,2,14,16,'#4A5568'],[5,5,5,13,'#7D8696'],[10,5,5,13,'#7D8696'],[9,6,2,11,'#C5B8F0'],[7,2,6,2,'#9B89D1']] },
+    G: { name: '扭蛋機', title: '隨機推薦', desc: '交給運氣挑一個角色', skin: 'gacha', color: '#D8746A', render: renderGacha,
+         icon: [[5,2,10,9,'#2E2C4A'],[6,6,3,3,'#D8746A'],[10,5,3,3,'#71998A'],[8,8,3,3,'#D9AD70'],[4,11,12,7,'#B5504A'],[4,11,12,1,'#D8746A'],[8,13,4,3,'#1C1414']] },
+    MENU: { name: '直接前往任一設施', title: '快速探索', skin: 'counter', render: renderMenu }
+  };
+  const ORDER = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+
+  /* ---------- 視窗管理（同時只會有一個） ---------- */
+  const app = document.getElementById('app');
+  const overlay = document.getElementById('overlay');
+  const modal = document.getElementById('modal');
+  const mTitle = document.getElementById('modal-title');
+  const mSub = document.getElementById('modal-sub');
+  const mBody = document.getElementById('modal-body');
+  let opener = null;
+
+  function openPanel(key, from) {
+    const f = FAC[key];
+    if (!f) return;
+    if (overlay.hidden) opener = from || document.activeElement;
+    modal.dataset.skin = f.skin;
+    mTitle.textContent = f.title;
+    mSub.textContent = f.name;
+    overlay.hidden = false;
+    document.body.classList.add('modal-open');
+    app.inert = true;
+    setView(f.render, null, true);
+  }
+  function closePanel() {
+    if (overlay.hidden) return;
+    overlay.hidden = true;
+    mBody.replaceChildren();
+    document.body.classList.remove('modal-open');
+    app.inert = false;
+    const back = opener;
+    opener = null;
+    if (back && document.contains(back) && typeof back.focus === 'function') back.focus({ preventScroll: true });
+  }
+  /* 在同一個視窗內切換畫面；focusSel 可指定切換後要聚焦的元素 */
+  function setView(render, focusSel, isOpen) {
+    mBody.replaceChildren();
+    mBody.scrollTop = 0;
+    render(mBody);
+    requestAnimationFrame(() => {
+      const target = (focusSel && mBody.querySelector(focusSel)) || (!isOpen && mBody.querySelector('[data-focus]')) || mTitle;
+      target.focus({ preventScroll: !!focusSel });
+      if (focusSel && target !== mTitle) target.scrollIntoView({ block: 'nearest' });
+    });
+  }
+  function focusables() {
+    return Array.from(modal.querySelectorAll('a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'))
+      .filter(n => n.getClientRects().length);
+  }
+  document.getElementById('modal-close').addEventListener('click', closePanel);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closePanel(); });
+  document.addEventListener('keydown', e => {
+    if (overlay.hidden) return;
+    if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
+    if (e.key !== 'Tab') return;
+    const f = focusables();
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1], cur = document.activeElement;
+    if (e.shiftKey && (cur === first || cur === mTitle || !modal.contains(cur))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (cur === last || !modal.contains(cur))) { e.preventDefault(); first.focus(); }
+  });
+
+  /* ---------- 作品詳細（各面板共用） ---------- */
+  function showDetail(w, back) {
+    setView(body => {
+      const world = w.worldId ? worldsById.get(w.worldId) : null;
+      body.append(
+        el('button', { type: 'button', class: 'btn btn-ghost back', onclick: back }, '← 返回'),
+        el('article', { class: 'detail' },
+          coverEl(w, { eager: true }),
+          el('div', null,
+            el('h3', { tabindex: '-1', 'data-focus': '' }, w.title),
+            w.demo ? el('span', { class: 'demo-badge' }, '示範資料') : null,
+            el('p', { class: 'desc' }, w.description || '尚未填寫介紹。'),
+            el('dl', { class: 'meta-dl' },
+              el('dt', null, '分類'),
+              el('dd', null, cats(w).length ? el('ul', { class: 'taglist' }, cats(w).map(c => el('li', { class: 'tag' }, c))) : '未分類'),
+              tags(w).length ? [el('dt', null, '標籤'), el('dd', null, el('ul', { class: 'taglist' }, tags(w).map(x => el('li', null,
+                el('button', { type: 'button', class: 'tag tag-btn', 'aria-label': `在圖庫搜尋「${x}」`, onclick: () => { gState.q = x; gState.cat = '全部'; openPanel('B'); } }, x)))))] : null,
+              el('dt', null, '世界觀'), el('dd', null, world ? world.name : '未歸屬'),
+              w.publishedAt ? [el('dt', null, '發布日期'), el('dd', null, el('time', { datetime: w.publishedAt }, formatDate(w.publishedAt)))] : null),
+            el('div', { class: 'actions' }, linkEl(w.url)))));
+    });
+  }
+
+  /* ---------- 設施列表（接待櫃台與快速探索共用） ---------- */
+  function facilityList() {
+    return el('ul', { class: 'fac-list' }, ORDER.map(k => {
+      const f = FAC[k];
+      return el('li', null, el('button', { type: 'button', class: 'fac-btn', style: `--c:${f.color}`, onclick: () => openPanel(k) },
+        pixelIcon(f.icon), el('span', null, el('strong', null, `${f.name}：${f.title}`), el('span', null, f.desc))));
+    }));
+  }
+
+  /* A｜接待櫃台 */
+  function renderWelcome(body) {
+    body.append(
+      el('p', { class: 'lead' }, DATA.site.welcome || '歡迎來到中繼休息大廳。'),
+      el('h3', { class: 'section-title' }, '怎麼逛'),
+      el('ul', { class: 'howto' },
+        el('li', null, '點擊大廳裡的家具，就會打開對應的設施。'),
+        el('li', null, '使用鍵盤時，按 Tab 在家具之間切換，Enter 或空白鍵開啟。'),
+        el('li', null, '手機上可以左右滑動大廳，或用上方的「快速探索」直接前往。'),
+        el('li', null, '按 Esc、點視窗外側或右上角的關閉鍵，都能回到大廳。')),
+      el('h3', { class: 'section-title' }, '設施一覽'),
+      facilityList());
+  }
+
+  /* 快速探索 */
+  function renderMenu(body) {
+    body.append(el('p', { class: 'intro' }, '不用找家具，直接選要去的地方。'), facilityList());
+  }
+
+  /* B｜書櫃：角色圖庫 */
+  const gState = { q: '', cat: '全部' };
+  function renderGallery(body) {
+    const search = el('input', { type: 'search', class: 'search', id: 'gallery-search', placeholder: '搜尋名稱或標籤，例如：香港、甜寵', autocomplete: 'off', enterkeyhint: 'search' });
+    search.value = gState.q;
+    const status = el('p', { class: 'status', 'aria-live': 'polite' });
+    const grid = el('div', { class: 'grid' });
+    const chipBtns = ['全部', ...CAT_NAMES].map(c => el('button', {
+      type: 'button', class: 'chip', 'aria-pressed': String(c === gState.cat),
+      onclick: e => { gState.cat = c; chipBtns.forEach(b => b.setAttribute('aria-pressed', String(b === e.currentTarget))); update(); }
+    }, c));
+    search.addEventListener('input', () => { gState.q = search.value; update(); });
+
+    function update() {
+      const q = gState.q.trim().toLowerCase();
+      const list = DATA.works.filter(w =>
+        (gState.cat === '全部' || cats(w).includes(gState.cat)) &&
+        (!q || w.title.toLowerCase().includes(q) || tags(w).some(x => x.toLowerCase().includes(q)) ||
+         String((worldsById.get(w.worldId) || {}).name || '').toLowerCase().includes(q)));
+      grid.replaceChildren();
+      if (!DATA.works.length) {
+        status.textContent = '';
+        grid.append(emptyState('書櫃還是空的。在 SITE_DATA.works 加入作品後，就會出現在這裡。'));
+        return;
+      }
+      if (!list.length) {
+        status.textContent = '沒有符合的作品';
+        grid.append(emptyState('沒有符合條件的作品。換個關鍵字，或清除篩選再看看。', {
+          label: '清除篩選', onclick: () => { gState.q = ''; gState.cat = '全部'; setView(renderGallery, '#gallery-search'); }
+        }));
+        return;
+      }
+      status.textContent = `共 ${list.length} 件作品`;
+      list.forEach(w => grid.append(el('button', {
+        type: 'button', class: 'card', 'data-id': w.id,
+        onclick: () => showDetail(w, () => setView(renderGallery, byId(w.id)))
+      }, coverEl(w), el('span', { class: 'card-title' }, w.title), el('span', { class: 'card-meta' }, shortTags(w)))));
+    }
+    body.append(
+      el('div', { class: 'toolbar' },
+        el('label', { class: 'sr-only', for: 'gallery-search' }, '搜尋作品名稱或標籤'), search,
+        el('div', { class: 'chips', role: 'group', 'aria-label': '依分類篩選' }, chipBtns)),
+      status, grid);
+    update();
+  }
+
+  /* C｜公告欄 */
+  function renderUpdates(body) {
+    const list = DATA.updates.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    if (!list.length) { body.append(emptyState('公告欄上目前沒有新的紙條。')); return; }
+    body.append(el('ul', { class: 'notes' }, list.map((u, i) => {
+      const work = u.workId ? worksById.get(u.workId) : null;
+      let action = null;
+      if (work) action = el('button', { type: 'button', class: 'note-link', 'data-id': `note-${i}`, onclick: () => showDetail(work, () => setView(renderUpdates, byId(`note-${i}`))) }, '查看作品');
+      else if (isHttps(u.url)) action = el('a', { class: 'note-link', href: u.url.trim(), target: '_blank', rel: 'noopener noreferrer' }, '前往連結', el('span', { class: 'sr-only' }, '（在新分頁開啟）'));
+      return el('li', { class: 'note' },
+        u.date ? el('time', { datetime: u.date }, formatDate(u.date)) : null,
+        el('h3', null, u.title || '無標題'),
+        u.summary ? el('p', null, u.summary) : null,
+        action);
+    })));
+  }
+
+  /* D｜沙發區：精選推薦（超過 6 個時隨機展示 6 個） */
+  let featuredBatch = null;
+  function renderFeatured(body, keep) {
+    const pool = DATA.works.filter(w => w.featured);
+    if (!pool.length) { body.append(emptyState('還沒有精選作品。在作品資料加上 featured: true 就會出現在這裡。')); return; }
+    if (!keep || !featuredBatch) featuredBatch = pool.length > 6 ? shuffle(pool).slice(0, 6) : pool.slice();
+    const back = w => () => setView(b => renderFeatured(b, true), byId(w.id));
+    body.append(
+      el('div', { class: 'feature-head' },
+        el('p', { class: 'intro' }, pool.length > 6 ? `沙發旁堆著 ${pool.length} 本精選，這次先翻開其中 6 本。` : '第一次來的話，可以從這幾個故事開始。'),
+        pool.length > 6 ? el('button', { type: 'button', class: 'btn', onclick: () => setView(b => renderFeatured(b, false), '.feature-head .btn') }, '換一批') : null),
+      el('div', { class: 'features' }, featuredBatch.map(w => el('article', { class: 'feature' },
+        coverEl(w, { badge: false }),
+        el('div', null,
+          el('h3', null, w.title),
+          w.demo ? el('span', { class: 'demo-badge' }, '示範資料') : null,
+          el('p', { style: 'margin-top:8px' }, w.description || ''),
+          el('div', { class: 'actions' }, linkEl(w.url),
+            el('button', { type: 'button', class: 'btn', 'data-id': w.id, onclick: () => showDetail(w, back(w)) }, '詳細資料')))))));
+  }
+
+  /* E｜終端機：世界觀資料庫 */
+  const tState = { world: null };
+  function renderTerminal(body) {
+    if (!DATA.worlds.length) { body.append(emptyState('資料庫裡還沒有世界觀。在 SITE_DATA.worlds 新增後就會出現。')); return; }
+    if (!worldsById.has(tState.world)) tState.world = DATA.worlds[0].id;
+    const path = el('p', { class: 'term-path' });
+    const detail = el('section', { class: 'term-detail', 'aria-label': '世界觀內容' });
+    const btns = DATA.worlds.map(wd => el('button', {
+      type: 'button', class: 'term-item', 'aria-current': String(wd.id === tState.world),
+      onclick: e => { tState.world = wd.id; btns.forEach(b => b.setAttribute('aria-current', String(b === e.currentTarget))); draw(); }
+    }, el('span', { class: 'term-name' }, wd.name), el('span', { class: 'term-count' }, `${DATA.works.filter(w => w.worldId === wd.id).length} 位角色`)));
+
+    function draw() {
+      const wd = worldsById.get(tState.world);
+      const list = DATA.works.filter(w => w.worldId === wd.id);
+      path.textContent = `lounge/worlds/${wd.id}`;
+      detail.replaceChildren(...[
+        el('h3', null, wd.name),
+        wd.tagline ? el('p', { class: 'tagline' }, wd.tagline) : null,
+        el('p', { class: 'summary' + (wd.summary ? '' : ' muted') }, wd.summary || '這個世界觀的介紹還沒寫。'),
+        el('p', { class: 'term-stat' }, `收錄角色：${list.length}`),
+        list.length ? workRows(list, w => showDetail(w, () => setView(renderTerminal, byId(w.id))))
+                    : el('div', { style: 'margin-top:12px' }, emptyState('這個世界還沒有角色入住。'))].filter(Boolean));
+    }
+    body.append(path, el('div', { class: 'term' },
+      el('nav', { 'aria-label': '世界觀列表' }, el('ul', { class: 'term-list' }, btns.map(b => el('li', null, b)))), detail));
+    draw();
+  }
+
+  /* F｜電梯：作品分類 */
+  const lState = { cat: ALL };
+  function renderElevator(body) {
+    const floors = CAT_NAMES.map((c, i) => ({ code: `${i + 1}F`, cat: c })).concat([{ code: '全', cat: ALL }]);
+    if (!floors.some(f => f.cat === lState.cat)) lState.cat = ALL;
+    const code = el('span', { class: 'lift-floor', 'aria-hidden': 'true' });
+    const name = el('span', { class: 'lift-name' });
+    const results = el('div', { class: 'lift-results' });
+    const btns = floors.map(f => el('button', {
+      type: 'button', class: 'lift-btn', 'aria-pressed': String(f.cat === lState.cat),
+      onclick: e => { lState.cat = f.cat; btns.forEach(b => b.setAttribute('aria-pressed', String(b === e.currentTarget))); draw(); }
+    }, el('span', { class: 'num', 'aria-hidden': 'true' }, f.code), el('span', null, f.cat), el('span', { class: 'cnt' }, `${worksIn(f.cat).length} 件`)));
+
+    function draw() {
+      const f = floors.find(x => x.cat === lState.cat);
+      code.textContent = f.code;
+      name.textContent = `目前樓層：${f.cat}`;
+      const list = worksIn(f.cat);
+      results.replaceChildren(list.length
+        ? workRows(list, w => showDetail(w, () => setView(renderElevator, byId(w.id))))
+        : emptyState('這一層目前沒有作品。'));
+    }
+    body.append(el('div', { class: 'lift-display', 'aria-live': 'polite' }, code, name),
+      el('div', { class: 'lift-buttons', role: 'group', 'aria-label': '選擇樓層' }, btns), results);
+    draw();
+  }
+
+  /* G｜扭蛋機：隨機推薦 */
+  let lastPick = null;
+  const CAP_COLORS = ['#D8746A', '#71998A', '#D9AD70', '#9B89D1', '#6AA0D8', '#E88AA8'];
+  function capsuleSvg() {
+    const s = svg('svg', { viewBox: '0 0 24 24', 'shape-rendering': 'crispEdges', 'aria-hidden': 'true' });
+    const bottom = svg('g', { fill: '#E9DDC5' });
+    [[4,12,16,4],[6,16,12,2],[8,18,8,2]].forEach(([x,y,w,h]) => bottom.append(svg('rect', { x, y, width: w, height: h })));
+    const top = svg('g', { class: 'cap-top' });
+    const topOutline = svg('g', { fill: '#1A1D24' });
+    [[7,3,10,3],[5,5,14,3],[3,7,18,5]].forEach(([x,y,w,h]) => topOutline.append(svg('rect', { x, y, width: w, height: h })));
+    const topFill = svg('g', { class: 'cap-color', fill: '#D8746A' });
+    [[8,4,8,2],[6,6,12,2],[4,8,16,4]].forEach(([x,y,w,h]) => topFill.append(svg('rect', { x, y, width: w, height: h })));
+    top.append(topOutline, topFill, svg('rect', { x: 7, y: 7, width: 2, height: 2, fill: '#FFFFFF', opacity: .7 }), svg('rect', { x: 4, y: 11, width: 16, height: 1, fill: '#000', opacity: .25 }));
+    const outline = svg('g', { fill: '#1A1D24' });
+    [[3,12,18,5],[5,12,14,7],[7,12,10,9]].forEach(([x,y,w,h]) => outline.append(svg('rect', { x, y, width: w, height: h })));
+    s.append(outline, bottom, top);
+    return s;
+  }
+  function renderGacha(body) {
+    if (!DATA.works.length) { body.append(emptyState('扭蛋機裡還沒有扭蛋。新增作品資料之後就能抽了。')); return; }
+    const capsule = el('div', { class: 'capsule' }, capsuleSvg());
+    const color = capsule.querySelector('.cap-color');
+    const drawBtn = el('button', { type: 'button', class: 'btn btn-primary' }, '抽取角色');
+    const result = el('div', { class: 'gacha-result', 'aria-live': 'polite' },
+      el('p', { class: 'gacha-idle' }, '轉一下把手，看看今天遇到誰。'));
+
+    function pick() {
+      const pool = DATA.works.length > 1 ? DATA.works.filter(w => w.id !== lastPick) : DATA.works;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    function show(w, moveFocus) {
+      result.replaceChildren(el('article', { class: 'gacha-card' },
+        coverEl(w, { eager: true }),
+        el('div', null,
+          el('h3', { tabindex: '-1' }, w.title),
+          w.demo ? el('span', { class: 'demo-badge' }, '示範資料') : null,
+          el('p', null, w.description || ''),
+          el('div', { class: 'actions' }, linkEl(w.url),
+            el('button', { type: 'button', class: 'btn', onclick: () => showDetail(w, () => setView(renderGacha)) }, '詳細資料')))));
+      if (moveFocus) result.querySelector('h3').focus();
+    }
+    drawBtn.addEventListener('click', () => {
+      if (drawBtn.disabled) return;
+      const w = pick();
+      lastPick = w.id;
+      color.setAttribute('fill', CAP_COLORS[hash(w.id) % CAP_COLORS.length]);
+      const finish = () => {
+        capsule.classList.remove('rolling');
+        capsule.classList.add('open');
+        show(w, false);
+        drawBtn.disabled = false;
+        drawBtn.textContent = '再抽一次';
+      };
+      capsule.classList.remove('open', 'rolling');
+      if (reduceMotion.matches) { finish(); return; }
+      drawBtn.disabled = true;
+      void capsule.offsetWidth;
+      capsule.classList.add('rolling');
+      setTimeout(finish, 520);
+    });
+    body.append(el('div', { class: 'gacha' },
+      el('div', { class: 'gacha-machine' }, el('div', { class: 'capsule-stage' }, capsule), drawBtn), result));
+    if (lastPick && worksById.has(lastPick)) {
+      const w = worksById.get(lastPick);
+      color.setAttribute('fill', CAP_COLORS[hash(w.id) % CAP_COLORS.length]);
+      capsule.classList.add('open');
+      drawBtn.textContent = '再抽一次';
+      show(w, false);
+    }
+  }
+
+  /* ---------- 場景互動：事件委派 ---------- */
+  const scene = document.getElementById('scene');
+  const stage = document.getElementById('stage');
+  const tip = document.getElementById('tip');
+
+  function activate(h) {
+    h.classList.remove('tap');
+    void h.getBoundingClientRect();
+    h.classList.add('tap');
+    setTimeout(() => h.classList.remove('tap'), 420);
+    hideTip();
+    openPanel(h.dataset.panel, h);
+  }
+  function showTip(h) {
+    const f = FAC[h.dataset.panel];
+    if (!f) return;
+    tip.replaceChildren(el('strong', null, f.name), el('span', null, f.title));
+    const r = h.querySelector('.hit').getBoundingClientRect();
+    const s = stage.getBoundingClientRect();
+    const x = Math.min(Math.max(r.left + r.width / 2 - s.left, 80), s.width - 80);
+    let y = r.top - s.top;
+    const inside = y < 44;
+    tip.classList.toggle('inside', inside);
+    tip.style.left = `${x}px`;
+    tip.style.top = `${inside ? Math.max(y, 0) : y}px`;
+    tip.classList.add('show');
+  }
+  function hideTip() { tip.classList.remove('show'); }
+
+  scene.addEventListener('click', e => { const h = e.target.closest('.hot'); if (h) activate(h); });
+  scene.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const h = e.target.closest('.hot');
+    if (!h) return;
+    e.preventDefault();
+    activate(h);
+  });
+  scene.addEventListener('pointerover', e => {
+    if (e.pointerType !== 'mouse') return;
+    const h = e.target.closest('.hot');
+    if (h) showTip(h);
+  });
+  scene.addEventListener('pointerout', e => {
+    const h = e.target.closest('.hot');
+    if (h && !h.contains(e.relatedTarget)) hideTip();
+  });
+  scene.addEventListener('focusin', e => { const h = e.target.closest('.hot'); if (h) showTip(h); });
+  scene.addEventListener('focusout', hideTip);
+
+  document.getElementById('quick').addEventListener('click', e => openPanel('MENU', e.currentTarget));
+
+  /* 網站文字 */
+  if (DATA.site.title) {
+    document.getElementById('site-title').textContent = DATA.site.title;
+    document.title = DATA.site.subtitle ? `${DATA.site.title}｜${DATA.site.subtitle}` : DATA.site.title;
+  }
+  if (DATA.site.subtitle) document.getElementById('site-subtitle').textContent = DATA.site.subtitle;
+
+  /* 手機：一開始把大廳捲到中間 */
+  const scroller = document.getElementById('stage-scroll');
+  requestAnimationFrame(() => {
+    const extra = scroller.scrollWidth - scroller.clientWidth;
+    if (extra > 0) scroller.scrollLeft = extra / 2;
+  });
+})();
+</script>
+</body>
+</html>
