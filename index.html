@@ -108,9 +108,22 @@ main{ padding:0 clamp(8px,2vw,24px) 20px; }
 }
 
 @media (max-width: 760px){
-  .stage{ width:820px; min-width:820px; }
+  .stage{ width:clamp(820px, calc((100svh - 190px) * 1.6), 1040px); min-width:820px; }
   .stage-scroll{ padding:6px 12px 10px; }
   .hint .desk-only{ display:none; }
+}
+/* 手機橫向：縮小頁首、隱藏提示，讓整個大廳一次放進畫面 */
+@media (max-height: 500px) and (orientation: landscape){
+  .topbar{ padding:6px max(16px, env(safe-area-inset-right,0px)) 4px max(16px, env(safe-area-inset-left,0px)); }
+  .brand{ gap:8px; }
+  .brand svg{ width:20px; height:25px; }
+  .brand h1{ font-size:1rem; }
+  .brand p{ display:none; }
+  .btn-quick{ min-height:40px; padding:4px 14px; font-size:.875rem; }
+  main{ padding:0 max(8px, env(safe-area-inset-right,0px)) 8px max(8px, env(safe-area-inset-left,0px)); }
+  .stage-scroll{ padding:4px 6px; }
+  .stage{ width:min(100%, calc((100svh - 70px) * 1.6)); min-width:0; }
+  .hint{ display:none; }
 }
 @media (min-width: 761px){ .hint .touch-only{ display:none; } }
 
@@ -218,7 +231,7 @@ main{ padding:0 clamp(8px,2vw,24px) 20px; }
 .modal-body h3{ font-family:var(--f-title); letter-spacing:.04em; }
 .modal-body [data-focus]:focus{ outline:none; }
 
-@media (max-width: 640px){
+@media (max-width: 640px), (max-height: 500px){
   .overlay{ padding:0; }
   .modal{
     width:100%; height:100%; max-height:none;
